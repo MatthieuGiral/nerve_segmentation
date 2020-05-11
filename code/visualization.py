@@ -4,7 +4,7 @@
 # Chris Hefele, May 2016
 
 IMAGES_TO_SHOW = 20  # configure to taste :)
-
+#matthieu
 import glob
 import os
 import os.path
