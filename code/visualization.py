@@ -71,5 +71,9 @@ def main():
         if images_shown >= IMAGES_TO_SHOW:
             break
 
+def testHannah():
+    print("salut")
+
+
 
 main()
