@@ -4,6 +4,7 @@ import os
 import matplotlib.image as mpimg
 from PIL import Image
 from tqdm import tqdm
+import util_images as uI
 
 if __name__ == "__main__":
 
