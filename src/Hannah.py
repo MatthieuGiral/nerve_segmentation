@@ -103,16 +103,15 @@ def Unet_method(X,Y,img_dim):
     #Définit X et Y !!
     results = model.fit(X, Y, validation_split=0.1, batch_size=32, epochs=25)
     model.evaluate(X,Y)
-    return model
 
-    EPOCHS=25
-    results = model.fit(X, Y, validation_split=0.1, batch_size=16, epochs=EPOCHS)
+
+
 
     accuracy = results.history['accuracy']
 
     val_accuracy = results.history['val_accuracy']
 
-    epochs = range(EPOCHS)
+    epochs = range(25)
 
     plt.figure()
     plt.plot(epochs, accuracy, 'r', label='Training accuracy')
@@ -124,6 +123,8 @@ def Unet_method(X,Y,img_dim):
     plt.legend()
     plt.show()
 
+    return model
+
 
 if __name__ == "__main__":
     img_dim = (32,32,1)
@@ -131,4 +132,4 @@ if __name__ == "__main__":
     X_train, Y_train = X[:300], Y[:300]
     X_test, Y_test = X[300:], Y[300:]
     model = Unet_method(X_train, Y_train, img_dim)
-    model.evaluate(X_test,Y_test)
+    model.evaluate(X_test, Y_test)
