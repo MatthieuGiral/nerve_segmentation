@@ -15,7 +15,7 @@ def plot_image(img, title=None):
 def fimg_to_fmask(img_path):
     """
     >>> fimg_to_fmask('../data/train/36_62.tif')
-    '../data/train/19_81_mask.tif'
+    '../data/train/36_62_mask.tif'
 
     @param img_path: the path of the image you want to get the mask from
     @return:path of the mask
@@ -81,6 +81,8 @@ def get_annotated_data(n_images,
     return X, Y
 
 if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
     X, Y = get_annotated_data(20)
     print('ok')
     print(get_annotated_data(10, new_size = (32,32))[0].shape == (32, 32, 10))

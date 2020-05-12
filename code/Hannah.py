@@ -3,6 +3,7 @@ import tensorflow as tf
 import os
 import matplotlib.image as mpimg
 from PIL import Image
+<<<<<<< HEAD
 from tqdm import tqdm
 import util_images as uI
 
@@ -74,6 +75,9 @@ if __name__ == "__main__":
 
     Unet_method(X, Y, img_dim)
 
+=======
+from code.util_images import *
+>>>>>>> 88ded1365ff6e441b5c70881c917944baa543d48
 
 def Unet_method(X,Y,img_dim):
     [img_width, img_depth, img_channels] = img_dim
@@ -167,6 +171,11 @@ def Unet_method(X,Y,img_dim):
     #on peut tester avec adam et avec stochastic grad. descent
     
     model.summary()
-
     #Définit X et Y !!
-    results = model.fit(X, Y, validation_split=0.1, batch_size=16, epochs=25,callbacks=callbacks)
+    results = model.fit(X, Y, validation_split=0.1, batch_size=16, epochs=25)
+
+
+if __name__ == "__main__":
+    img_dim = (32,32,1)
+    X, Y = get_annotated_data(20)
+    Unet_method(X, Y, img_dim)
