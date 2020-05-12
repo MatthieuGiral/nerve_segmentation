@@ -5,6 +5,8 @@ import matplotlib.image as mpimg
 from PIL import Image
 from util_images import *
 
+from src.util_images import get_annotated_data
+
 def Unet_method(X,Y,img_dim):
     [img_width, img_depth, img_channels] = img_dim
 
@@ -83,7 +85,7 @@ def Unet_method(X,Y,img_dim):
 
     u9 = tf.keras.layers.Conv2DTranspose(16, (2,2), \
         strides=(2,2),padding='same')(c8)
-    u9 = tf.keras.layers.concatenate([u9, c1], axis = 0)
+    u9 = tf.keras.layers.concatenate([u9, c1])
     print(tf.shape(u9))
     c9 = tf.keras.layers.Conv2D(16, (3,3), activation='relu', \
         kernel_initializer='he_normal', padding='same')(u9)
@@ -92,7 +94,7 @@ def Unet_method(X,Y,img_dim):
         kernel_initializer='he_normal', padding='same')(c9)
 
     outputs = tf.keras.layers.Conv2D(1, (1,1), activation ='sigmoid')(c9)
-
+    print(tf.size(outputs))
     model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
     #on peut tester avec adam et avec stochastic grad. descent
