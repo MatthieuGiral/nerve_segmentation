@@ -3,7 +3,7 @@ import tensorflow as tf
 import os
 import matplotlib.image as mpimg
 from PIL import Image
-from .util_images import *
+from util_images import *
 
 def Unet_method(X,Y,img_dim):
     [img_width, img_depth, img_channels] = img_dim
