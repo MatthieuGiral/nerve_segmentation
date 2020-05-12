@@ -66,7 +66,7 @@ def get_annotated_data(n_images,
     """
     f_ultrasounds = [img for img in glob.glob(os.path.join(data_dir,"train/*.tif")) if 'mask' not in img][:n_images]
     f_masks = [fimg_to_fmask(fimg) for fimg in f_ultrasounds][:n_images]
-    if show_images:
+    if show_images is True:
         for f_ultrasound in f_ultrasounds:
             show_image_with_mask(f_ultrasound)
     imgs = [Image.open(f_ultrasound) for f_ultrasound in f_ultrasounds]

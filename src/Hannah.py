@@ -83,7 +83,8 @@ def Unet_method(X,Y,img_dim):
 
     u9 = tf.keras.layers.Conv2DTranspose(16, (2,2), \
         strides=(2,2),padding='same')(c8)
-    u9 = tf.keras.layers.concatenate([u9, c1])
+    u9 = tf.keras.layers.concatenate([u9, c1], axis = 0)
+    print(tf.shape(u9))
     c9 = tf.keras.layers.Conv2D(16, (3,3), activation='relu', \
         kernel_initializer='he_normal', padding='same')(u9)
     c9 = tf.keras.layers.Dropout(0.1)(c9)
@@ -103,5 +104,5 @@ def Unet_method(X,Y,img_dim):
 
 if __name__ == "__main__":
     img_dim = (32,32,1)
-    X, Y = get_annotated_data(20)
+    X, Y = get_annotated_data(20, new_size = img_dim[:-1])
     Unet_method(X, Y, img_dim)
