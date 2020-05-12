@@ -6,6 +6,8 @@ import cv2
 import numpy as np
 from PIL import Image
 
+data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),'../data')
+
 def plot_image(img, title=None):
     plt.figure(figsize=(15, 20))
     plt.title(title)
@@ -14,8 +16,6 @@ def plot_image(img, title=None):
 
 def fimg_to_fmask(img_path):
     """
-    >>> fimg_to_fmask('../data/train/36_62.tif')
-    '../data/train/36_62_mask.tif'
 
     @param img_path: the path of the image you want to get the mask from
     @return:path of the mask
@@ -64,7 +64,7 @@ def get_annotated_data(n_images,
     @return: (X, Y): Arrays of shape (img.shape[0], img.shape[0], n_images) \
                             which represents the images and the associated masks
     """
-    f_ultrasounds = [img for img in glob.glob("../data/train/*.tif") if 'mask' not in img][:n_images]
+    f_ultrasounds = [img for img in glob.glob(os.path.join(data_dir,"train/*.tif")) if 'mask' not in img][:n_images]
     f_masks = [fimg_to_fmask(fimg) for fimg in f_ultrasounds][:n_images]
     if show_images:
         for f_ultrasound in f_ultrasounds:
