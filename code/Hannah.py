@@ -92,7 +92,7 @@ def Unet_method(X,Y,img_dim):
 
     outputs = tf.keras.layers.Conv2D(1, (1,1), activation ='sigmoid')(c9)
 
-    model = tf.keras.Model(inputs=[inputs], outpus=[outputs])
+    model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
     #on peut tester avec adam et avec stochastic grad. descent
     
