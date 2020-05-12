@@ -5,6 +5,7 @@ import matplotlib.image as mpimg
 from PIL import Image
 from util_images import *
 
+
 from src.util_images import get_annotated_data
 
 def Unet_method(X,Y,img_dim):
@@ -102,17 +103,14 @@ def Unet_method(X,Y,img_dim):
     model.summary()
     #Définit X et Y !!
     results = model.fit(X, Y, validation_split=0.1, batch_size=32, epochs=25)
-    model.evaluate(X,Y)
+    model.evaluate(X, Y)
 
 
 
 
     accuracy = results.history['accuracy']
-
     val_accuracy = results.history['val_accuracy']
-
     epochs = range(25)
-
     plt.figure()
     plt.plot(epochs, accuracy, 'r', label='Training accuracy')
     plt.plot(epochs, val_accuracy, 'bo', label='Validation accuracy')
