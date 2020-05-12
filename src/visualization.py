@@ -3,8 +3,8 @@
 # This should outline the BP nerves in the training images.
 # Chris Hefele, May 2016
 
-IMAGES_TO_SHOW = 20  # configure to taste :)
-#matthieu
+IMAGES_TO_SHOW = 10  # configure to taste :)
+# matthieu
 import glob
 import os
 import os.path
@@ -71,9 +71,11 @@ def main():
         if images_shown >= IMAGES_TO_SHOW:
             break
 
+
 def testHannah():
     print("salut")
 
 
+print(2)
 
 main()
