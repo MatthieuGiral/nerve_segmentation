@@ -4,6 +4,7 @@ import os
 import matplotlib.image as mpimg
 from PIL import Image
 from util_images import *
+from src.training_plots import *
 
 
 from src.util_images import get_annotated_data
@@ -106,20 +107,8 @@ def Unet_method(X,Y,img_dim):
     model.evaluate(X, Y)
 
 
+    training_curves(results, EPOCHS=25)
 
-
-    accuracy = results.history['accuracy']
-    val_accuracy = results.history['val_accuracy']
-    epochs = range(25)
-    plt.figure()
-    plt.plot(epochs, accuracy, 'r', label='Training accuracy')
-    plt.plot(epochs, val_accuracy, 'bo', label='Validation accuracy')
-    plt.title('Training and Validation Accuracy')
-    plt.xlabel('Epoch')
-    plt.ylabel('Accuracy Value')
-    plt.ylim([0, 1])
-    plt.legend()
-    plt.show()
 
     return model
 
