@@ -27,10 +27,10 @@ if __name__ == "__main__":
     """
     img_dim = [1, 2, 3]
 
-    Unet_method(img_dim)
+    Unet_method(X, Y, img_dim)
 
 
-def Unet_method(img_dim):
+def Unet_method(X,Y,img_dim):
     [img_width, img_depth, img_channels] = img_dim
 
     inputs = tf.keras.layers.Input((img_width, img_depth, img_channels))
@@ -122,3 +122,6 @@ def Unet_method(img_dim):
     #on peut tester avec adam et avec stochastic grad. descent
     
     model.summary()
+
+    #Définit X et Y !!
+    results = model.fit(X, Y, validation_split=0.1, batch_size=16, epochs=25,callbacks=callbacks)
