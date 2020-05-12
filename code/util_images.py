@@ -49,11 +49,18 @@ def show_image_with_mask(img_path):
     return
 
 def get_annotated_data(n_images,
-                       show_images = False):
+                       show_images = False,
+                       new_size = None):
     """
     Read n_images and transform it into arrays
+
+    >>> get_annotated_data(10, new_size = (32,32))[0].shape == (32, 32, 10)
+    True
+
+
     @param n_images: number of images to be fetched
     @param show_images: whether or not to show the images which are loaded
+    @param new_size: if you want the image to be resized to a specific size, specify a tuple (img_height, img_width)
     @return: (X, Y): Arrays of shape (img.shape[0], img.shape[0], n_images) \
                             which represents the images and the associated masks
     """
@@ -62,8 +69,13 @@ def get_annotated_data(n_images,
     if show_images:
         for f_ultrasound in f_ultrasounds:
             show_image_with_mask(f_ultrasound)
-    imgs = [np.asarray(Image.open(f_ultrasound)) for f_ultrasound in f_ultrasounds]
-    masks = [np.asarray(Image.open(f_mask)) for f_mask in f_masks]
+    imgs = [Image.open(f_ultrasound) for f_ultrasound in f_ultrasounds]
+    masks = [Image.open(f_mask) for f_mask in f_masks]
+    if new_size is not None:
+        imgs = [img.resize(new_size) for img in imgs]
+        masks = [mask.resize(new_size) for mask in masks]
+    imgs = [np.asarray(img) for img in imgs]
+    masks = [np.asarray(mask) for mask in masks]
     X = np.dstack(imgs)
     Y = np.dstack(masks)
     return X, Y
@@ -71,3 +83,4 @@ def get_annotated_data(n_images,
 if __name__ == '__main__':
     X, Y = get_annotated_data(20)
     print('ok')
+    print(get_annotated_data(10, new_size = (32,32))[0].shape == (32, 32, 10))
