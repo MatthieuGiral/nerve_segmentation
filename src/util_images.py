@@ -54,14 +54,14 @@ def get_annotated_data(n_images,
     """
     Read n_images and transform it into arrays
 
-    >>> get_annotated_data(10, new_size = (32,32))[0].shape == (32, 32, 10)
+    >>> get_annotated_data(10, new_size = (32,32))[0].shape == (10, 32, 32, 1)
     True
 
 
     @param n_images: number of images to be fetched
     @param show_images: whether or not to show the images which are loaded
     @param new_size: if you want the image to be resized to a specific size, specify a tuple (img_height, img_width)
-    @return: (X, Y): Arrays of shape (img.shape[0], img.shape[0], n_images) \
+    @return: (X, Y): Arrays of shape (n_images, img.shape[0], img.shape[1], 1) \
                             which represents the images and the associated masks
     """
     f_ultrasounds = [img for img in glob.glob(os.path.join(data_dir,"train/*.tif")) if 'mask' not in img][:n_images]
@@ -74,10 +74,10 @@ def get_annotated_data(n_images,
     if new_size is not None:
         imgs = [img.resize(new_size) for img in imgs]
         masks = [mask.resize(new_size) for mask in masks]
-    imgs = [np.asarray(img) for img in imgs]
-    masks = [np.asarray(mask) for mask in masks]
-    X = np.dstack(imgs)
-    Y = np.dstack(masks)
+    else:
+        new_size = imgs[0].size
+    X = np.dstack(imgs).reshape((n_images, new_size[0], new_size[1], 1))
+    Y = np.dstack(masks).reshape((n_images, new_size[0], new_size[1], 1))
     return X, Y
 
 if __name__ == '__main__':
