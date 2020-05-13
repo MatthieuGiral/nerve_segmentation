@@ -115,13 +115,13 @@ class U_net():
         return model
 
 if __name__ == '__main__':
-    img_dim = (572, 572, 1)
+    img_dim = (576, 576, 1)
     unet = U_net(img_dim)
     train_test_split = 0.4
-    n_sample = 500
+    n_sample = 50
     n_train = int(train_test_split*n_sample)
     X, Y = get_annotated_data(n_sample, new_size=img_dim[:-1])
     X_train, Y_train = X[:n_train], Y[:n_train]
     X_test, Y_test = X[n_train:], Y[n_train:]
-    unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=32, epochs=25, shuffle=True)
+    unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=4, epochs=10)
     unet.model.evaluate(X_test,Y_test)
