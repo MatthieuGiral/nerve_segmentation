@@ -9,7 +9,7 @@ class U_net():
     def __init__(self,
                  img_dims):
         self.img_dims = img_dims
-        self.construct_network()
+        self.model = self.construct_network()
         return
 
     def construct_network(self):
@@ -21,32 +21,24 @@ class U_net():
         s = tf.keras.layers.Lambda(lambda x: x / 255)(inputs)  # float
 
         c1 = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same')(s)
-        # c1=c1[:,:570,:570,:]
-        print(c1.shape)
         c1 = tf.keras.layers.Dropout(0.1)(c1)
-
+        print(c1.shape)
         c1 = tf.keras.layers.Conv2D(64, (3, 3), activation='relu',kernel_initializer='he_normal', padding='same')(c1)
-        # c1 = c1[:, :568, :568, :]
-        p1 = tf.keras.layers.MaxPooling2D((2, 2), padding='same')(c1)
+        print(c1.shape)
+        p1 = tf.keras.layers.MaxPooling2D((2, 2))(c1)
         print(p1.shape)
         c2 = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(p1)
-        # c1 = c1[:, :282, :282, :]
         c2 = tf.keras.layers.Dropout(0.1)(c2)
         c2 = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c2)
-        # c2 = c2[:, :280, :280, :]
-        print(c2.shape)
         p2 = tf.keras.layers.MaxPooling2D((2, 2))(c2)
 
         c3 = tf.keras.layers.Conv2D(256, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(p2)
-        # c3 = c3[:, :138, :138, :]
         c3 = tf.keras.layers.Dropout(0.1)(c3)
         c3 = tf.keras.layers.Conv2D(256, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c3)
-        # c3 = c3[:, :136, :136, :]
-        print(c3.shape)
         p3 = tf.keras.layers.MaxPooling2D((2, 2))(c3)
 
 
@@ -56,32 +48,28 @@ class U_net():
 
         c4 = tf.keras.layers.Conv2D(512, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(p3)
-        # c4 = c4[:, :66, :66, :]
         c4 = tf.keras.layers.Dropout(0.15)(c4)
         c4 = tf.keras.layers.Conv2D(512, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c4)
-        # c4 = c4[:, :64, :64,:]
-        print(c4.shape)
+
         p4 = tf.keras.layers.MaxPooling2D((2,2))(c4)
 
         c5 =  tf.keras.layers.Conv2D(1024, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(p4)
-        # c5 = c5[:, :30, :30, :]
+
         c5 = tf.keras.layers.Dropout(0.2)(c5)
 
         c5 =  tf.keras.layers.Conv2D(1024, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c5)
-        # c5 = c5[:, :28, :28, :]
 
         ##decoding path:
         #   now dropout decreases again
 
         u6 = tf.keras.layers.Conv2DTranspose(512, (2, 2), \
                                              strides=(2, 2), padding='same')(c5)
-        print(u6.shape)
         u6 = tf.keras.layers.concatenate([u6, c4])
-        print(u6.shape)
-        c6 = tf.keras.layers.Conv2D(512, (3, 3), activation='relu', \
+
+        c6=tf.keras.layers.Conv2D(512, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(u6)
         c6 = tf.keras.layers.Dropout(0.15)(c6)
         c6=tf.keras.layers.Conv2D(512, (3, 3), activation='relu', \
@@ -100,13 +88,10 @@ class U_net():
 
         u8 = tf.keras.layers.Conv2DTranspose(128, (2, 2), \
                                              strides=(2, 2), padding='same')(c7)
-
         u8 = tf.keras.layers.concatenate([u8, c2])
         c8 = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(u8)
-
         c8 = tf.keras.layers.Dropout(0.1)(c8)
-
         c8 = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c8)
 
@@ -127,6 +112,16 @@ class U_net():
         model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
         model.compile(optimizer='adam', loss='cosine_similarity', metrics=['accuracy'])
         model.summary()
+        return model
 
 if __name__ == '__main__':
-    U_net((544,544,1))
+    img_dim = (572, 572, 1)
+    unet = U_net(img_dim)
+    train_test_split = 0.4
+    n_sample = 500
+    n_train = int(train_test_split*n_sample)
+    X, Y = get_annotated_data(n_sample, new_size=img_dim[:-1])
+    X_train, Y_train = X[:n_train], Y[:n_train]
+    X_test, Y_test = X[n_train:], Y[n_train:]
+    unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=32, epochs=25, shuffle=True)
+    unet.model.evaluate(X_test,Y_test)
