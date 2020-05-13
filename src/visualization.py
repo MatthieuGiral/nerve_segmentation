@@ -52,6 +52,7 @@ def main():
 
     f_ultrasounds = [img for img in glob.glob("../data/train/*.tif") if 'mask' not in img]
     # f_ultrasounds.sort()
+
     f_masks = [fimg_to_fmask(fimg) for fimg in f_ultrasounds]
 
     images_shown = 0
@@ -59,7 +60,9 @@ def main():
     for f_ultrasound, f_mask in zip(f_ultrasounds, f_masks):
 
         img = plt.imread(f_ultrasound)
+
         mask = plt.imread(f_mask)
+
 
         if mask_not_blank(mask):
             # plot_image(grays_to_RGB(img),  title=f_ultrasound)

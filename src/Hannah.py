@@ -18,7 +18,7 @@ def Unet_method(X,Y,img_dim):
     s = tf.keras.layers.Lambda(lambda x: x/255)(inputs) #float
     c1 = tf.keras.layers.Conv2D(16, (3,3), activation = 'relu', \
         kernel_initializer='he_normal', padding='same')(s)
-    # padding = same: size input image = size output image
+    #padding = same: size input image = size output image
     #conv2D ? 16, (3,3) ?
 
     ## encoding path:
@@ -130,7 +130,8 @@ if __name__ == "__main__":
 
     # tests d'affichage
 
-    X, Y = get_annotated_data(5, show_images=True)
+    X, Y = get_annotated_data(5, new_size=(572,572) show_images=True)
+    plot_image(X[0])
 
 
     plot_image(image_with_mask(X_train[0], Y_train[0]))
