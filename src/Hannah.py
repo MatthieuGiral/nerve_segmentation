@@ -96,12 +96,12 @@ def Unet_method(X,Y,img_dim):
     outputs = tf.keras.layers.Conv2D(1, (1,1), activation ='sigmoid')(c9)
     print(tf.size(outputs))
     model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
-    model.compile(optimizer='adam', loss='cosine_similarity', metrics=['accuracy'])
+    model.compile(optimizer='adam', loss=tf.keras.losses.CosineSimilarity(), metrics=['accuracy'])
     #on peut tester avec adam et avec stochastic grad. descent
     
     model.summary()
     #Définit X et Y !!
-    results = model.fit(X, Y, validation_split=0.1, batch_size=32, epochs=25)
+    results = model.fit(X, Y, validation_split=0.1, batch_size=100, epochs=5)
     model.evaluate(X,Y)
     return model
 
