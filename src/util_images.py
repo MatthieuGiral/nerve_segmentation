@@ -71,18 +71,20 @@ def get_annotated_data(n_images,
             show_image_with_mask(f_ultrasound)
     imgs = [Image.open(f_ultrasound) for f_ultrasound in f_ultrasounds]
     masks = [Image.open(f_mask) for f_mask in f_masks]
+
     if new_size is not None:
         imgs = [img.resize(new_size) for img in imgs]
         masks = [mask.resize(new_size) for mask in masks]
     else:
         new_size = imgs[0].size
-    X = np.dstack(imgs).reshape((n_images, new_size[0], new_size[1], 1))
-    Y = np.dstack(masks).reshape((n_images, new_size[0], new_size[1], 1))
+
+    X = np.stack(imgs).reshape((n_images, new_size[0], new_size[1], 1))
+    Y = np.stack(masks).reshape((n_images, new_size[0], new_size[1], 1))
     return X, Y
 
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    X, Y = get_annotated_data(2000, show_images= True)
+    X, Y = get_annotated_data(1)
     print('ok')
     print(get_annotated_data(10, new_size = (32,32))[0].shape == (32, 32, 10))
