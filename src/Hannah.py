@@ -123,15 +123,12 @@ if __name__ == "__main__":
     model = Unet_method(X_train, Y_train, img_dim)
     model.evaluate(X_test, Y_test)
 
-    X, Y = get_annotated_data(5, new_size=(572,572), show_images=True)
-    plot_image(X[0])
 
 
-    plot_image(image_with_mask(X_train[0], Y_train[0]))
-    image = X_test[0]
-    mask = Y_test[0]
-    pred_mask = model.predict(X_test)[0]
+    image = X_test[0][:,:,0]
+    mask = Y_test[0][:,:,0]
     plot_image(image_with_mask(image, mask))
+    pred_mask = model.predict(X_test)[0][:,:,0]
+
     plot_image(image_with_mask(image, pred_mask))
 
-    """test display branch"""
