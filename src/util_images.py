@@ -77,7 +77,9 @@ def get_annotated_data(n_images,
         masks = [mask.resize(new_size) for mask in masks]
     else:
         new_size = imgs[0].size
-
+    if show_images is True:
+        for i in range(n_images):
+            image_with_mask(imgs[i],masks[i])
     X = np.stack(imgs).reshape((n_images, new_size[0], new_size[1], 1))
     Y = np.stack(masks).reshape((n_images, new_size[0], new_size[1], 1))
     return X, Y
@@ -85,6 +87,6 @@ def get_annotated_data(n_images,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    X, Y = get_annotated_data(1)
+    X, Y = get_annotated_data(2)
     print('ok')
     print(get_annotated_data(10, new_size = (32,32))[0].shape == (32, 32, 10))
