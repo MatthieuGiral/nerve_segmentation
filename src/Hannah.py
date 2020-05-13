@@ -3,9 +3,11 @@ import tensorflow as tf
 import os
 import matplotlib.image as mpimg
 from PIL import Image
-from util_images import *
 
+from src.training_plots import *
+import IPython.display as display
 from src.util_images import get_annotated_data
+from src.util_images import *
 
 def Unet_method(X,Y,img_dim):
     [img_width, img_depth, img_channels] = img_dim
@@ -96,19 +98,41 @@ def Unet_method(X,Y,img_dim):
     outputs = tf.keras.layers.Conv2D(1, (1,1), activation ='sigmoid')(c9)
     print(tf.size(outputs))
     model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
-    model.compile(optimizer='adam', loss=tf.keras.losses.CosineSimilarity(), metrics=['accuracy'])
+    model.compile(optimizer='adam', loss='cosine_similarity', metrics=['accuracy'])
     #on peut tester avec adam et avec stochastic grad. descent
     
     model.summary()
     #Définit X et Y !!
-    results = model.fit(X, Y, validation_split=0.1, batch_size=100, epochs=5)
-    model.evaluate(X,Y)
+    results = model.fit(X, Y, validation_split=0.1, batch_size=32, epochs=25, shuffle=True)
+    model.evaluate(X, Y)
+
+
+    training_curves(results, EPOCHS=25)
+
+
     return model
+
 
 if __name__ == "__main__":
     img_dim = (32,32,1)
-    X, Y = get_annotated_data(400, new_size = img_dim[:-1])
-    X_train, Y_train = X[:300], Y[:300]
-    X_test, Y_test = X[300:], Y[300:]
+
+    X, Y = get_annotated_data(40, new_size = img_dim[:-1])
+    X_train, Y_train = X[:30], Y[:30]
+    X_test, Y_test = X[30:], Y[30:]
+
+
     model = Unet_method(X_train, Y_train, img_dim)
-    model.evaluate(X_test,Y_test)
+    model.evaluate(X_test, Y_test)
+
+
+    # tests d'affichage
+
+    X, Y = get_annotated_data(5, show_images=True)
+
+
+    plot_image(image_with_mask(X_train[0], Y_train[0]))
+    image = X_test[0]
+    mask = Y_test[0]
+    pred_mask = model.predict(X_test)
+    plot_image(image_with_mask(image, mask))
+    plot_image(image_with_mask(image, pred_mask))

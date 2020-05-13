@@ -3,8 +3,8 @@
 # This should outline the BP nerves in the training images.
 # Chris Hefele, May 2016
 
-IMAGES_TO_SHOW = 20  # configure to taste :)
-#matthieu
+IMAGES_TO_SHOW = 10  # configure to taste :)
+# matthieu
 import glob
 import os
 import os.path
@@ -48,6 +48,8 @@ def plot_image(img, title=None):
 
 
 def main():
+
+
     f_ultrasounds = [img for img in glob.glob("../data/train/*.tif") if 'mask' not in img]
     # f_ultrasounds.sort()
     f_masks = [fimg_to_fmask(fimg) for fimg in f_ultrasounds]
@@ -69,11 +71,11 @@ def main():
             images_shown += 1
 
         if images_shown >= IMAGES_TO_SHOW:
+            print("NO IMAGES TO SHOW")
             break
+
 
 def testHannah():
     print("salut")
-
-
 
 main()
