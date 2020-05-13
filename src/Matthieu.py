@@ -1,8 +1,8 @@
-import src.Hannah
+import Hannah as H
 
-from src.training_plots import *
-from src.util_images import get_annotated_data
-from src.util_images import *
+from training_plots import *
+from util_images import get_annotated_data
+from util_images import *
 
 class U_net():
 
