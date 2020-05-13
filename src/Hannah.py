@@ -116,6 +116,9 @@ def Unet_method(X,Y,img_dim):
 if __name__ == "__main__":
     img_dim = (32,32,1)
 
+    X, Y = get_annotated_data(1, show_images=True)
+    print(np.shape(X))
+
     X, Y = get_annotated_data(40, new_size = img_dim[:-1])
     X_train, Y_train = X[:30], Y[:30]
     X_test, Y_test = X[30:], Y[30:]
@@ -133,6 +136,8 @@ if __name__ == "__main__":
     plot_image(image_with_mask(X_train[0], Y_train[0]))
     image = X_test[0]
     mask = Y_test[0]
-    pred_mask = model.predict(X_test)
+    pred_mask = model.predict(X_test)[0]
     plot_image(image_with_mask(image, mask))
     plot_image(image_with_mask(image, pred_mask))
+
+    """test display branch"""
