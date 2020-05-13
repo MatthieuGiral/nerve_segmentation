@@ -5,7 +5,6 @@ import matplotlib.image as mpimg
 from PIL import Image
 
 from src.training_plots import *
-import IPython.display as display
 from src.util_images import get_annotated_data
 from src.util_images import *
 
@@ -114,12 +113,9 @@ def Unet_method(X,Y,img_dim):
 
 
 if __name__ == "__main__":
-    img_dim = (32,32,1)
-
-    X, Y = get_annotated_data(1, show_images=True)
-    print(np.shape(X))
-
-    X, Y = get_annotated_data(40, new_size = img_dim[:-1])
+    img_dim = (572,572,1)
+    train_test_split = 0.4
+    X, Y = get_annotated_data(40, new_size=(572,572))
     X_train, Y_train = X[:30], Y[:30]
     X_test, Y_test = X[30:], Y[30:]
 
@@ -127,10 +123,7 @@ if __name__ == "__main__":
     model = Unet_method(X_train, Y_train, img_dim)
     model.evaluate(X_test, Y_test)
 
-
-    # tests d'affichage
-
-    X, Y = get_annotated_data(5, new_size=(572,572) show_images=True)
+    X, Y = get_annotated_data(5, new_size=(572,572), show_images=True)
     plot_image(X[0])
 
 

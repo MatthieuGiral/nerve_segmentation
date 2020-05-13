@@ -83,6 +83,6 @@ def get_annotated_data(n_images,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    X, Y = get_annotated_data(20)
+    X, Y = get_annotated_data(2000, show_images= True)
     print('ok')
     print(get_annotated_data(10, new_size = (32,32))[0].shape == (32, 32, 10))
