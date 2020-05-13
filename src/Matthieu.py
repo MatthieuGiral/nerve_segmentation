@@ -46,6 +46,7 @@ class U_net():
 
         c4 = tf.keras.layers.Conv2D(512, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(p3)
+        c4 = tf.keras.layers.Dropout(0.15)(c4)
         c4 = tf.keras.layers.Conv2D(512, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c4)
 
@@ -53,6 +54,8 @@ class U_net():
 
         c5 =  tf.keras.layers.Conv2D(1024, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(p4)
+
+        c5 = tf.keras.layers.Dropout(0.2)(c5)
 
         c5 =  tf.keras.layers.Conv2D(1024, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c5)
@@ -66,6 +69,7 @@ class U_net():
 
         c6=tf.keras.layers.Conv2D(512, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(u6)
+        c6 = tf.keras.layers.Dropout(0.15)(c6)
         c6=tf.keras.layers.Conv2D(512, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c6)
 
@@ -75,6 +79,7 @@ class U_net():
 
         c7 = tf.keras.layers.Conv2D(256, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(u7)
+        c7 = tf.keras.layers.Dropout(0.10)(c7)
         c7= tf.keras.layers.Conv2D(256, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c7)
 
@@ -84,7 +89,7 @@ class U_net():
         u8 = tf.keras.layers.concatenate([u8, c2])
         c8 = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(u8)
-        c8 = tf.keras.layers.Dropout(0.2)(c8)
+        c8 = tf.keras.layers.Dropout(0.1)(c8)
         c8 = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c8)
 
@@ -95,12 +100,12 @@ class U_net():
 
         c9 = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(u9)
-        c9 = tf.keras.layers.Dropout(0.2)(c9)
+        c9 = tf.keras.layers.Dropout(0.1)(c9)
         c9 = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c9)
 
 
-        outputs = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid')(c9)
+        outputs = tf.keras.layers.Conv2D(2, (1, 1), activation='sigmoid')(c9)
         print(tf.size(outputs))
         model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
         model.compile(optimizer='adam', loss='cosine_similarity', metrics=['accuracy'])
