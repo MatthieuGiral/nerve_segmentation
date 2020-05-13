@@ -81,4 +81,6 @@ def main():
 def testHannah():
     print("salut")
 
-main()
+if __name__=='__main()__' :
+
+    main()
