@@ -21,10 +21,12 @@ class U_net():
         s = tf.keras.layers.Lambda(lambda x: x / 255)(inputs)  # float
 
         c1 = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same')(s)
+        c1 = tf.keras.layers.Dropout(0.1)(c1)
+        print(c1.shape)
         c1 = tf.keras.layers.Conv2D(64, (3, 3), activation='relu',kernel_initializer='he_normal', padding='same')(c1)
-
+        print(c1.shape)
         p1 = tf.keras.layers.MaxPooling2D((2, 2))(c1)
-
+        print(p1.shape)
         c2 = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(p1)
         c2 = tf.keras.layers.Dropout(0.1)(c2)
@@ -50,7 +52,7 @@ class U_net():
         c4 = tf.keras.layers.Conv2D(512, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c4)
 
-        p4 = tf.keras.layers.MaxPooling2D((2,2))(c6)
+        p4 = tf.keras.layers.MaxPooling2D((2,2))(c4)
 
         c5 =  tf.keras.layers.Conv2D(1024, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(p4)
@@ -63,7 +65,7 @@ class U_net():
         ##decoding path:
         #   now dropout decreases again
 
-        u6 = tf.keras.layers.Conv2DTranspose(512, 28, (2, 2), \
+        u6 = tf.keras.layers.Conv2DTranspose(512, (2, 2), \
                                              strides=(2, 2), padding='same')(c5)
         u6 = tf.keras.layers.concatenate([u6, c4])
 
@@ -73,7 +75,7 @@ class U_net():
         c6=tf.keras.layers.Conv2D(512, (3, 3), activation='relu', \
                                     kernel_initializer='he_normal', padding='same')(c6)
 
-        u7= tf.keras.layers.Conv2DTranspose(256, 28, (2, 2), \
+        u7= tf.keras.layers.Conv2DTranspose(256, (2, 2), \
                                              strides=(2, 2), padding='same')(c6)
         u7=tf.keras.layers.concatenate([u7,c3])
 
@@ -112,4 +114,4 @@ class U_net():
         model.summary()
 
 if __name__ == '__main__':
-    U_net((500,500,1))
+    U_net((572,572,1))
