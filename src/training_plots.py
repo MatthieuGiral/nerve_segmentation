@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 
 def training_curves (results, EPOCHS) :
+    """ Displays accuracy on training and validation batches after each epoch"""
     epochs = range(EPOCHS)
 
     accuracy = results.history['accuracy']
