@@ -28,7 +28,10 @@ def fimg_to_fmask(img_path):
 def image_with_mask(img, mask):
     # returns a copy of the image with edges of the mask added in red
     img_color = np.dstack((img, img, img))
-    mask_edges = cv2.Canny(mask, 100, 200) > 0
+    try:
+        mask_edges = cv2.Canny(np.array(mask), 100, 200) > 0
+    except:
+        print('ok') 
     img_color[mask_edges, 0] = 255  # set channel 0 to bright red, green & blue channels to 0
     img_color[mask_edges, 1] = 0
     img_color[mask_edges, 2] = 0
@@ -66,9 +69,6 @@ def get_annotated_data(n_images,
     """
     f_ultrasounds = [img for img in glob.glob(os.path.join(data_dir,"train/*.tif")) if 'mask' not in img][:n_images]
     f_masks = [fimg_to_fmask(fimg) for fimg in f_ultrasounds][:n_images]
-    if show_images is True:
-        for f_ultrasound in f_ultrasounds:
-            show_image_with_mask(f_ultrasound)
     imgs = [Image.open(f_ultrasound) for f_ultrasound in f_ultrasounds]
     masks = [Image.open(f_mask) for f_mask in f_masks]
 
@@ -79,7 +79,8 @@ def get_annotated_data(n_images,
         new_size = imgs[0].size
     if show_images is True:
         for i in range(n_images):
-            image_with_mask(imgs[i],masks[i])
+            plt.imshow(image_with_mask(imgs[i],masks[i]))
+            plt.show()
     X = np.stack(imgs).reshape((n_images, new_size[0], new_size[1], 1))
     Y = np.stack(masks).reshape((n_images, new_size[0], new_size[1], 1))
     return X, Y
@@ -87,6 +88,8 @@ def get_annotated_data(n_images,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    X, Y = get_annotated_data(2)
+    X, Y = get_annotated_data(10,
+                              new_size=(520,520),
+                              show_images=True)
     print('ok')
     print(get_annotated_data(10, new_size = (32,32))[0].shape == (32, 32, 10))
