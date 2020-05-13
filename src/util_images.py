@@ -57,7 +57,9 @@ def get_annotated_data(n_images,
     """
     Read n_images and transform it into arrays
 
-    >>> get_annotated_data(10, new_size = (32,32))[0].shape == (10, 32, 32, 1)
+    >>> get_annotated_data(10, \
+                            new_size = (520,520), \
+                            show_images = True)[0].shape == (10, 520, 520, 1)
     True
 
 
@@ -88,8 +90,3 @@ def get_annotated_data(n_images,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    X, Y = get_annotated_data(10,
-                              new_size=(520,520),
-                              show_images=True)
-    print('ok')
-    print(get_annotated_data(10, new_size = (32,32))[0].shape == (32, 32, 10))
