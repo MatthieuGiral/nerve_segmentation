@@ -3,6 +3,7 @@ import tensorflow as tf
 from training_plots import *
 from util_images import get_annotated_data
 from util_images import *
+from matplotlib import pyplot as plt
 
 class U_net():
 
@@ -112,6 +113,7 @@ class U_net():
         model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
         model.compile(optimizer='adam', loss=loss_function, metrics=[dice_coef])
         model.summary()
+
         return model
 
 # Définition de notre metrique, exemple avecdice coef :
@@ -133,6 +135,9 @@ def loss_function (y_true, y_pred):
     bce = tf.keras.losses.BinaryCrossentropy()
     return bce(y_true, y_pred)
 
+def display_masks():
+    print("Result masks:")
+
 
 if __name__ == '__main__':
     img_dim = (544, 544, 1)
@@ -143,5 +148,13 @@ if __name__ == '__main__':
     # X, Y = get_annotated_data(n_sample, new_size=img_dim[:-1])
     # X_train, Y_train = X[:n_train], Y[:n_train]
     # X_test, Y_test = X[n_train:], Y[n_train:]
-    # unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=4, epochs=10)
+
+    #model checkpoint
+    checkpointer = tf.keras.callbacks.ModelCheckpoint('model_file', \
+        verbose =1, save_best_only=True)
+    callbacks = [
+        tf.keras.callbacks.EarlyStopping(patience =2, monitor='valid_loss'), #restore_best_weights=True ? #stoppe le training quand valid_loss est minimisée
+        tf.keras.callbacks.TensorBoard(log_dir='logs', update_freq = 'epoch')] #store l'évolution des test metrics a chaque epochs et les affiche
+
+    # unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=4, epochs=10, callbacks = callbacks)  #ajout des callbacks en argument
     # unet.model.evaluate(X_test,Y_test)
