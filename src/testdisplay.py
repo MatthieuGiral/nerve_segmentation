@@ -18,7 +18,7 @@ F=X[0][:,:,0]
 plt.imshow(F)
 print(F.shape)
 F1=Y[0][:,:,0]
-plot_image(image_with_mask(F,F1))
+plot_image(plot_image_with_mask(F, F1))
 plot_image(X[0][:,:,0])
 X, Y = get_annotated_data(10, new_size=(572, 572), show_images=False)
 print(X[0][:,:,0].shape)

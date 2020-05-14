@@ -128,6 +128,7 @@ def binary_loss (y_true, y_pred):
     return bce(y_true, y_pred)
 
 def loss_function (y_true, y_pred) :
+    print(f'{binary_loss(y_true,y_pred)} {dice_coeff(y_true,y_pred)}')
     return (binary_loss(y_true,y_pred)+dice_coeff(y_true,y_pred))
 
 
@@ -141,6 +142,7 @@ if __name__ == "__main__":
 
     model = Unet_method(X_train, Y_train, img_dim)
     model.evaluate(X_test, Y_test)
+    print(model.predict(X_test[0]))
 
 
 

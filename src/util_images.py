@@ -25,16 +25,18 @@ def fimg_to_fmask(img_path):
     maskname = basename.replace(".tif", "_mask.tif")
     return os.path.join(dirname, maskname)
 
-def image_with_mask(img, mask):
+def plot_image_with_mask(img, mask, **kwargs):
     # returns a copy of the image with edges of the mask added in red
     img_color = np.dstack((img, img, img))
-    try:
-        mask_edges = cv2.Canny(np.array(mask), 100, 200) > 0
-    except:
-        print('ok') 
+    mask_edges = cv2.Canny(np.array(mask), 100, 200) > 0
+    for k in kwargs.keys():
+        key_mask_edges = cv2.Canny(np.array(np.array(kwargs[k]), 100, 200)) > 0
+        color_k = list(np.random.choice(range(256), size=3))
+        img_color[key_mask_edges,:] = color_k
     img_color[mask_edges, 0] = 255  # set channel 0 to bright red, green & blue channels to 0
     img_color[mask_edges, 1] = 0
     img_color[mask_edges, 2] = 0
+
     return img_color
 
 def show_image_with_mask(img_path):
@@ -47,7 +49,7 @@ def show_image_with_mask(img_path):
     img = plt.imread(img_path)
     mask = plt.imread(mask_path)
     f_combined = img_path + " & " + mask_path
-    plot_image(image_with_mask(img, mask), title=f_combined)
+    plot_image_with_mask(img, mask)
     print('plotted:', f_combined)
     return
 
@@ -81,7 +83,7 @@ def get_annotated_data(n_images,
         new_size = imgs[0].size
     if show_images is True:
         for i in range(n_images):
-            plt.imshow(image_with_mask(imgs[i],masks[i]))
+            plot_image_with_mask(imgs[i], masks[i])
             plt.show()
     X = np.stack(imgs).reshape((n_images, new_size[0], new_size[1], 1))
     Y = np.stack(masks).reshape((n_images, new_size[0], new_size[1], 1))

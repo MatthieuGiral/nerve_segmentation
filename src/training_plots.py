@@ -17,3 +17,6 @@ def training_curves (results, EPOCHS) :
     plt.ylim([0, 1])
     plt.legend()
     plt.show()
+
+def predict_example_and_plot(model, X, Y):
+    for i in range(len(X)):
