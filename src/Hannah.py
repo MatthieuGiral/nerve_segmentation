@@ -97,38 +97,50 @@ def Unet_method(X,Y,img_dim):
     outputs = tf.keras.layers.Conv2D(1, (1,1), activation ='sigmoid')(c9)
     print(tf.size(outputs))
     model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
-    model.compile(optimizer='adam', loss='cosine_similarity', metrics=['accuracy'])
+    model.compile(optimizer='adam', loss=loss_function, metrics=[dice_coeff,'accuracy'])
     #on peut tester avec adam et avec stochastic grad. descent
     
     model.summary()
     #Définit X et Y !!
-    results = model.fit(X, Y, validation_split=0.1, batch_size=32, epochs=25, shuffle=True)
+    results = model.fit(X, Y, validation_split=0.1, batch_size=10, epochs=10, shuffle=True)
     model.evaluate(X, Y)
 
 
-    training_curves(results, EPOCHS=25)
+    training_curves(results, EPOCHS=10)
 
 
     return model
 
+# Définition de notre metrique, exemple avecdice coef :
+def dice_coeff (y_true, y_pred, smooth = 1):
+    #if not len(y_pred) or not len(y_true): return 0.0
+    if not y_pred.shape[0] or not y_true.shape[0]: return 0.0
+    if y_pred == y_true: return 1.0
+    numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
+    denominator = tf.reduce_sum(y_true + y_pred, axis=(1,2))
+
+    dice = 1-(numerator + smooth)/(denominator + smooth)
+    return dice
+
+#définition de notre loss function
+def binary_loss (y_true, y_pred):
+    bce = tf.keras.losses.BinaryCrossentropy() #binary cross entropy with logits ?
+    return bce(y_true, y_pred)
+
+def loss_function (y_true, y_pred) :
+    return (binary_loss(y_true,y_pred)+dice_coeff(y_true,y_pred))
+
+
 
 if __name__ == "__main__":
-    img_dim = (572,572,1)
+    img_dim = (544,544,1)
     train_test_split = 0.4
-    X, Y = get_annotated_data(40, new_size=(572,572))
+    X, Y = get_annotated_data(40, new_size=(544,544))
     X_train, Y_train = X[:30], Y[:30]
     X_test, Y_test = X[30:], Y[30:]
-
 
     model = Unet_method(X_train, Y_train, img_dim)
     model.evaluate(X_test, Y_test)
 
 
-
-    image = X_test[0][:,:,0]
-    mask = Y_test[0][:,:,0]
-    plot_image(image_with_mask(image, mask))
-    pred_mask = model.predict(X_test)[0][:,:,0]
-
-    plot_image(image_with_mask(image, pred_mask))
 
