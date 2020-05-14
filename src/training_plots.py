@@ -21,5 +21,6 @@ def training_curves (results, EPOCHS) :
 
 def predict_example_and_plot(model, X, Y):
     for i in range(len(X)):
-        plot_image_with_mask(X[i], Y[i], model.predict(X[i]))
+        Y_pred = model.predict(X[i].reshape((1,544, 544, 1)))
+        plot_image_with_mask(X[i], Y[i], Y_pred)
     return
