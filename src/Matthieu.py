@@ -1,9 +1,16 @@
 import Hannah as H
 import tensorflow as tf
-from training_plots import *
-from util_images import get_annotated_data
-from util_images import *
 from matplotlib import pyplot as plt
+
+try:
+    from util_images import get_annotated_data
+    from util_images import *
+    from training_plots import *
+
+except:
+    from src.util_images import get_annotated_data
+    from src.util_images import *
+    from src.training_plots import *
 
 class U_net():
 
