@@ -19,10 +19,7 @@ def training_curves (results) :
     plt.show()
     return
 
-def training_curves2(results) :
-    plt.plot(results.history)
-    plt.show()
-    return
+
 
 def predict_example_and_plot(model, X, Y):
     for i in range(len(X)):
