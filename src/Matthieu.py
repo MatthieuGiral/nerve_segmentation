@@ -116,7 +116,8 @@ class U_net():
 
 # Définition de notre metrique, exemple avecdice coef :
 def dice_coef (y_true, y_pred, smooth = 1):
-    if not len(y_pred) or not len(y_true): return 0.0
+    #if not len(y_pred) or not len(y_true): return 0.0
+    if not y_pred.shape[0] or not y_true.shape[0]: return 0.0
     if y_pred == y_true: return 1.0
     numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
     denominator = tf.reduce_sum(y_true, axis=(1,2)) + \
