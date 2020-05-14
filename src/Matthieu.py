@@ -110,18 +110,26 @@ class U_net():
         outputs = tf.keras.layers.Conv2D(2, (1, 1), activation='sigmoid')(c9)
         print(tf.size(outputs))
         model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
-        model.compile(optimizer='adam', loss='cosine_similarity', metrics=['accuracy'])
+        model.compile(optimizer='adam', loss='binary_crossentropy', metrics=[dice_coef])
         model.summary()
         return model
 
+
+def dice_coef (y_true, y_pred):
+    numerator = 2 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
+    denominator = tf.reduce_sum(y_true + y_pred, axis=(1, 2))
+
+    return 1 - numerator / denominator
+
+
 if __name__ == '__main__':
-    img_dim = (576, 576, 1)
+    img_dim = (544, 544, 1)
     unet = U_net(img_dim)
-    train_test_split = 0.4
-    n_sample = 50
-    n_train = int(train_test_split*n_sample)
-    X, Y = get_annotated_data(n_sample, new_size=img_dim[:-1])
-    X_train, Y_train = X[:n_train], Y[:n_train]
-    X_test, Y_test = X[n_train:], Y[n_train:]
-    unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=4, epochs=10)
-    unet.model.evaluate(X_test,Y_test)
+    # train_test_split = 0.4
+    # n_sample = 50
+    # n_train = int(train_test_split*n_sample)
+    # X, Y = get_annotated_data(n_sample, new_size=img_dim[:-1])
+    # X_train, Y_train = X[:n_train], Y[:n_train]
+    # X_test, Y_test = X[n_train:], Y[n_train:]
+    # unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=4, epochs=10)
+    # unet.model.evaluate(X_test,Y_test)
