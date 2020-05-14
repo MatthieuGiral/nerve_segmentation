@@ -36,7 +36,7 @@ def plot_image_with_mask(img, mask, **kwargs):
     img_color[mask_edges, 0] = 255  # set channel 0 to bright red, green & blue channels to 0
     img_color[mask_edges, 1] = 0
     img_color[mask_edges, 2] = 0
-
+    plt.imshow(img_color)
     return img_color
 
 def show_image_with_mask(img_path):
@@ -85,8 +85,8 @@ def get_annotated_data(n_images,
         for i in range(n_images):
             plot_image_with_mask(imgs[i], masks[i])
             plt.show()
-    X = np.stack(imgs).reshape((n_images, new_size[0], new_size[1], 1))
-    Y = np.stack(masks).reshape((n_images, new_size[0], new_size[1], 1))
+    X = np.stack(imgs).reshape((n_images, new_size[0], new_size[1], 1)) / 255
+    Y = np.stack(masks).reshape((n_images, new_size[0], new_size[1], 1)) / 255
     return X, Y
 
 if __name__ == '__main__':

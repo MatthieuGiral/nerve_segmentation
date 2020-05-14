@@ -3,19 +3,18 @@ import tensorflow as tf
 import os
 import matplotlib.image as mpimg
 from PIL import Image
-from training_plots import *
-from util_images import get_annotated_data
-from util_images import *
+from src.training_plots import *
+from src.util_images import get_annotated_data
+from src.util_images import *
 
 def Unet_method(X,Y,img_dim):
     [img_width, img_depth, img_channels] = img_dim
 
     inputs = tf.keras.layers.Input((img_width, img_depth, img_channels))
     #c1 only take float inputs so we multiply pixels by the values in the weights 
-    #to make them float (between 0-1)
-    s = tf.keras.layers.Lambda(lambda x: x/255)(inputs) #float
+    #to make them float (between 0-1) #float
     c1 = tf.keras.layers.Conv2D(16, (3,3), activation = 'relu', \
-        kernel_initializer='he_normal', padding='same')(s)
+        kernel_initializer='he_normal', padding='same')(inputs)
     #padding = same: size input image = size output image
     #conv2D ? 16, (3,3) ?
 
@@ -105,8 +104,6 @@ def Unet_method(X,Y,img_dim):
     #Définit X et Y !!
     results = model.fit(X, Y, validation_split=0.1, batch_size=10, epochs=10, shuffle=True)
     model.evaluate(X, Y)
-
-
     training_curves(results, EPOCHS=10)
 
 
