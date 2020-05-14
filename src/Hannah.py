@@ -12,7 +12,6 @@ except:
     from util_images import get_annotated_data
     from util_images import *
 
-
 def Unet_method(X,Y,img_dim):
     [img_width, img_depth, img_channels] = img_dim
 
