@@ -111,13 +111,13 @@ class U_net():
         outputs = tf.keras.layers.Conv2D(2, (1, 1), activation='sigmoid')(c9)
         print(tf.size(outputs))
         model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
-        model.compile(optimizer='adam', loss=loss_function, metrics=[dice_coef])
+        model.compile(optimizer='adam', loss=loss_function, metrics=[dice_coeff])
         model.summary()
 
         return model
 
 # Définition de notre metrique, exemple avecdice coef :
-def dice_coef (y_true, y_pred, smooth = 1):
+def dice_coeff (y_true, y_pred, smooth = 1):
     #if not len(y_pred) or not len(y_true): return 0.0
     if not y_pred.shape[0] or not y_true.shape[0]: return 0.0
     if y_pred == y_true: return 1.0
@@ -131,9 +131,13 @@ def dice_coef (y_true, y_pred, smooth = 1):
     return dice
 
 #définition de notre loss function
-def loss_function (y_true, y_pred):
+def binary_loss (y_true, y_pred):
     bce = tf.keras.losses.BinaryCrossentropy() #binary cross entropy with logits ?
     return bce(y_true, y_pred)
+
+def loss_function (y_true, y_pred) :
+    return (binary_loss(y_true,y_pred)+dice_coeff(y_true,y_pred))
+
 
 
 
