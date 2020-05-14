@@ -102,9 +102,9 @@ def Unet_method(X,Y,img_dim):
     
     model.summary()
     #Définit X et Y !!
-    results = model.fit(X, Y, validation_split=0.1, batch_size=10, epochs=10, shuffle=True)
+    results = model.fit(X, Y, validation_split=0.1, batch_size=10, epochs=1, shuffle=True)
     model.evaluate(X, Y)
-    training_curves(results, EPOCHS=10)
+    training_curves(results, EPOCHS=1)
 
 
     return model
@@ -144,11 +144,12 @@ if __name__ == "__main__":
     #print("Y:")
     #print (Y)
     #print(Y.shape)
-    X_train, Y_train = X[:30], Y[:30]
+    X_train, Y_train = X[:5], Y[:5]
     X_test, Y_test = X[30:], Y[30:]
     
     model = Unet_method(X_train, Y_train, img_dim)
     model.evaluate(X_test, Y_test)
+    predict_example_and_plot(model, X_train[:3], Y_train[:3])
     #print(model.predict(X_test[0]))
 
 

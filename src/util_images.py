@@ -25,14 +25,14 @@ def fimg_to_fmask(img_path):
     maskname = basename.replace(".tif", "_mask.tif")
     return os.path.join(dirname, maskname)
 
-def plot_image_with_mask(img, mask, **kwargs):
+def plot_image_with_mask(img, mask, pred_mask):
     # returns a copy of the image with edges of the mask added in red
+    for i in [img,mask,pred_mask]:
+        i = (i*255).astype(np.uint8)
     img_color = np.dstack((img, img, img))
     mask_edges = cv2.Canny(np.array(mask), 100, 200) > 0
-    for k in kwargs.keys():
-        key_mask_edges = cv2.Canny(np.array(np.array(kwargs[k]), 100, 200)) > 0
-        color_k = list(np.random.choice(range(256), size=3))
-        img_color[key_mask_edges,:] = color_k
+    pred_mask_edges = cv2.Canny(np.array(np.array(pred_mask), 100, 200)) > 0
+    img_color[pred_mask_edges,:] = (0,255,0)
     img_color[mask_edges, 0] = 255  # set channel 0 to bright red, green & blue channels to 0
     img_color[mask_edges, 1] = 0
     img_color[mask_edges, 2] = 0
