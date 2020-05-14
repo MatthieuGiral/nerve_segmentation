@@ -86,17 +86,19 @@ def Unet_method(X,Y,img_dim):
     u9 = tf.keras.layers.Conv2DTranspose(16, (2,2), \
         strides=(2,2),padding='same')(c8)
     u9 = tf.keras.layers.concatenate([u9, c1])
-    print(tf.shape(u9))
+    #print(tf.shape(u9))
     c9 = tf.keras.layers.Conv2D(16, (3,3), activation='relu', \
         kernel_initializer='he_normal', padding='same')(u9)
     c9 = tf.keras.layers.Dropout(0.1)(c9)
     c9 = tf.keras.layers.Conv2D(16, (3,3), activation='relu', \
         kernel_initializer='he_normal', padding='same')(c9)
 
-    outputs = tf.keras.layers.Conv2D(1, (1,1), activation ='sigmoid')(c9)
-    print(tf.size(outputs))
+    c10 = tf.keras.layers.Conv2D(2, (1,1), activation ='sigmoid')(c9)
+    outputs = tf.keras.layers.Softmax(axis = 3)(c10)
+    #print(tf.size(outputs))
     model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
-    model.compile(optimizer='adam', loss=loss_function, metrics=[dice_coeff,'accuracy'])
+    
+    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
     #on peut tester avec adam et avec stochastic grad. descent
     
     model.summary()
@@ -112,10 +114,10 @@ def Unet_method(X,Y,img_dim):
 
 # Définition de notre metrique, exemple avecdice coef :
 def dice_coeff (y_true_temp, y_pred, smooth = 1):
-    print("ytrue: ", y_true_temp)
-    print("", "y pred:", y_pred)
+    #print("ytrue: ", y_true_temp)
+    #print("", "y pred:", y_pred)
     y_true = tf.cast(y_true_temp, dtype = 'float32')
-    print("ytrue: ", y_true)
+    #print("ytrue: ", y_true)
 
     numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
     denominator = tf.reduce_sum(y_true + y_pred, axis=(1,2))
@@ -128,12 +130,7 @@ def binary_loss (y_true, y_pred):
     bce = tf.keras.losses.BinaryCrossentropy() #binary cross entropy with logits ?
     return bce(y_true, y_pred)
 
-<<<<<<< HEAD
 def loss_function (y_true, y_pred):
-=======
-def loss_function (y_true, y_pred) :
-    print(f'{binary_loss(y_true,y_pred)} {dice_coeff(y_true,y_pred)}')
->>>>>>> 2d0580db4e8088c42d7ef08e573ea32ac9a946c6
     return (binary_loss(y_true,y_pred)+dice_coeff(y_true,y_pred))
 
 
@@ -142,12 +139,20 @@ if __name__ == "__main__":
     img_dim = (544,544,1)
     train_test_split = 0.4
     X, Y = get_annotated_data(40, new_size=(544,544))
+    #Y1 = np.where(Y_temp == 0, 1, 0)
+    #print("Y1: ", Y1.shape)
+    #Y2 = np.where(Y_temp == 1, 1, 0)
+    #Y = np.concatenate((Y1,Y2), axis= 3)
+    #print("")
+    #print("Y:")
+    #print (Y)
+    #print(Y.shape)
     X_train, Y_train = X[:30], Y[:30]
     X_test, Y_test = X[30:], Y[30:]
-
+    
     model = Unet_method(X_train, Y_train, img_dim)
     model.evaluate(X_test, Y_test)
-    print(model.predict(X_test[0]))
+    #print(model.predict(X_test[0]))
 
 
 
