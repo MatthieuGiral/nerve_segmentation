@@ -98,7 +98,7 @@ def Unet_method(X,Y,img_dim):
     #print(tf.size(outputs))
     model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
     
-    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
+    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False), metrics=['accuracy'])
     #on peut tester avec adam et avec stochastic grad. descent
     
     model.summary()

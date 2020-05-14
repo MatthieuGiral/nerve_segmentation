@@ -133,11 +133,7 @@ def binary_loss (y_true, y_pred):
     return bce(y_true, y_pred)
 
 def loss_function (y_true, y_pred) :
-<<<<<<< HEAD
-    return (binary_loss(y_true,y_pred)+dice_coeff(y_true,y_pred))
-=======
     return (binary_loss(y_true,y_pred) + dice_coeff(y_true,y_pred))
->>>>>>> b6cc52d4a24d9fc5eee910b77d99d32658045866
 
 
 if __name__ == '__main__':
