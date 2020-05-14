@@ -102,7 +102,7 @@ def Unet_method(X,Y,img_dim):
     #print(tf.size(outputs))
     model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
     
-    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False), metrics=['accuracy'])
+    model.compile(optimizer='adam', loss=loss_function, metrics=['accuracy'])
     #on peut tester avec adam et avec stochastic grad. descent
     
     model.summary()
@@ -116,21 +116,18 @@ def Unet_method(X,Y,img_dim):
 
 # Définition de notre metrique, exemple avecdice coef :
 def dice_coeff (y_true_temp, y_pred, smooth = 1):
-    #print("ytrue: ", y_true_temp)
-    #print("", "y pred:", y_pred)
+
     y_true = tf.cast(y_true_temp, dtype = 'float32')
-    #print("ytrue: ", y_true)
-
-    numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
+    y_pred = y_pred[:, :, :, 1]
+    numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1,2))
     denominator = tf.reduce_sum(y_true + y_pred, axis=(1,2))
-
     dice = 1-(numerator + smooth)/(denominator + smooth)
     return dice
 
 #définition de notre loss function
 def binary_loss (y_true, y_pred):
-    bce = tf.keras.losses.BinaryCrossentropy() #binary cross entropy with logits ?
-    return bce(y_true, y_pred)
+    bce = tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred) #binary cross entropy with logits ?
+    return bce
 
 def loss_function (y_true, y_pred):
     return (binary_loss(y_true,y_pred)+dice_coeff(y_true,y_pred))
