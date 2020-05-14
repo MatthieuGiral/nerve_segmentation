@@ -133,7 +133,11 @@ def binary_loss (y_true, y_pred):
     return bce(y_true, y_pred)
 
 def loss_function (y_true, y_pred) :
+<<<<<<< HEAD
     return (binary_loss(y_true,y_pred)+dice_coeff(y_true,y_pred))
+=======
+    return (binary_loss(y_true,y_pred) + dice_coeff(y_true,y_pred))
+>>>>>>> b6cc52d4a24d9fc5eee910b77d99d32658045866
 
 
 if __name__ == '__main__':
@@ -147,12 +151,12 @@ if __name__ == '__main__':
     # X_test, Y_test = X[n_train:], Y[n_train:]
 
     #model checkpoint
-    checkpointer = tf.keras.callbacks.ModelCheckpoint('model_file', \
-        verbose =1, save_best_only=True)
-    callbacks = [
-        tf.keras.callbacks.EarlyStopping(patience =2, monitor='valid_loss'), #restore_best_weights=True ? #stoppe le training quand valid_loss est minimisée
-        tf.keras.callbacks.TensorBoard(log_dir='logs', update_freq = 'epoch')] #store l'évolution des test metrics a chaque epochs et les affiche
-
-    unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=4, epochs=10, callbacks = callbacks)  #ajout des callbacks en argument
-    unet.model.evaluate(X_test,Y_test)
+    # checkpointer = tf.keras.callbacks.ModelCheckpoint('model_file', \
+    #     verbose =1, save_best_only=True)
+    # callbacks = [
+    #     tf.keras.callbacks.EarlyStopping(patience =2, monitor='valid_loss'), #restore_best_weights=True ? #stoppe le training quand valid_loss est minimisée
+    #     tf.keras.callbacks.TensorBoard(log_dir='logs', update_freq = 'epoch')] #store l'évolution des test metrics a chaque epochs et les affiche
+    #
+    # unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=4, epochs=10, callbacks = callbacks)  #ajout des callbacks en argument
+    # unet.model.evaluate(X_test,Y_test)
 
