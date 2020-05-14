@@ -132,11 +132,9 @@ def dice_coef (y_true, y_pred, smooth = 1):
 
 #définition de notre loss function
 def loss_function (y_true, y_pred):
-    bce = tf.keras.losses.BinaryCrossentropy()
+    bce = tf.keras.losses.BinaryCrossentropy() #binary cross entropy with logits ?
     return bce(y_true, y_pred)
 
-def display_masks():
-    print("Result masks:")
 
 
 if __name__ == '__main__':
@@ -156,5 +154,6 @@ if __name__ == '__main__':
         tf.keras.callbacks.EarlyStopping(patience =2, monitor='valid_loss'), #restore_best_weights=True ? #stoppe le training quand valid_loss est minimisée
         tf.keras.callbacks.TensorBoard(log_dir='logs', update_freq = 'epoch')] #store l'évolution des test metrics a chaque epochs et les affiche
 
-    # unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=4, epochs=10, callbacks = callbacks)  #ajout des callbacks en argument
-    # unet.model.evaluate(X_test,Y_test)
+    unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=4, epochs=10, callbacks = callbacks)  #ajout des callbacks en argument
+    unet.model.evaluate(X_test,Y_test)
+
