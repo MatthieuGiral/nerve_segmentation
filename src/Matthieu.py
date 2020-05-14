@@ -115,11 +115,17 @@ class U_net():
         return model
 
 # Définition de notre metrique, exemple avecdice coef :
-def dice_coef (y_true, y_pred):
-    numerator = 2 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
-    denominator = tf.reduce_sum(y_true + y_pred, axis=(1, 2))
-
-    return 1 - numerator / denominator
+def dice_coef (y_true, y_pred, smooth = 1):
+    if not len(y_pred) or not len(y_true): return 0.0
+    if y_pred == y_true: return 1.0
+    numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
+    denominator = tf.reduce_sum(y_true, axis=(1,2)) + \
+        tf.reduce_sum(y_pred, axis=(1,2))
+    #denominator = tf.reduce_sum(y_true + y_pred, axis=(1, 2))
+    #return 1 - numerator / denominator
+    
+    dice = (numerator + smooth)/(denominator + smooth)
+    return dice
 
 #définition de notre loss function
 def loss_function (y_true, y_pred):
