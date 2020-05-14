@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import tensorflow as tf
+from src.util_images import plot_image_with_mask
 
 def training_curves (results, EPOCHS) :
     """ Displays accuracy on training and validation batches after each epoch"""
@@ -20,3 +21,4 @@ def training_curves (results, EPOCHS) :
 
 def predict_example_and_plot(model, X, Y):
     for i in range(len(X)):
+        plot_image_with_mask(X[i], Y[i], model.predict(X[i]))
