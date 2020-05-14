@@ -6,21 +6,16 @@ except:
     from src.util_images import plot_image_with_mask
 import numpy as np
 
-def training_curves (results, EPOCHS) :
+def training_curves (results) :
     """ Displays accuracy on training and validation batches after each epoch"""
-    epochs = range(EPOCHS)
-
-    accuracy = results.history['accuracy']
-    val_accuracy = results.history['val_accuracy']
 
     plt.figure()
-    plt.plot(epochs, accuracy, 'r', label='Training accuracy')
-    plt.plot(epochs, val_accuracy, 'bo', label='Validation accuracy')
-    plt.title('Training and Validation Accuracy')
-    plt.xlabel('Epoch')
-    plt.ylabel('Accuracy Value')
-    plt.ylim([0, 1])
-    plt.legend()
+    for key in results.history.keys() :
+        plt.plot(results.history[key])
+        plt.plot(results.history[key], label=key)
+        plt.title('Training curves')
+        plt.legend()
+
     plt.show()
     return
 
