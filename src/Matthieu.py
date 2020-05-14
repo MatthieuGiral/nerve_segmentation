@@ -127,7 +127,7 @@ def dice_coeff (y_true, y_pred, smooth = 1):
     #denominator = tf.reduce_sum(y_true + y_pred, axis=(1, 2))
     #return 1 - numerator / denominator
     
-    dice = (numerator + smooth)/(denominator + smooth)
+    dice = 1-(numerator + smooth)/(denominator + smooth)
     return dice
 
 #définition de notre loss function
