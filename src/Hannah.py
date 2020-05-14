@@ -102,7 +102,7 @@ def Unet_method(X,Y,img_dim):
     #print(tf.size(outputs))
     model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
     
-    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False), metrics=['accuracy'])
+    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False), metrics=['accuracy',dice_coeff])
     #on peut tester avec adam et avec stochastic grad. descent
     
     model.summary()
@@ -115,12 +115,8 @@ def Unet_method(X,Y,img_dim):
     return model
 
 # Définition de notre metrique, exemple avecdice coef :
-def dice_coeff (y_true_temp, y_pred, smooth = 1):
-    #print("ytrue: ", y_true_temp)
-    #print("", "y pred:", y_pred)
-    y_true = tf.cast(y_true_temp, dtype = 'float32')
-    #print("ytrue: ", y_true)
-
+def dice_coeff (y_true, y_pred, smooth = 1):
+    y_pred = tf.reshape(y_pred[:,:,:,1:], (-1,544,544,1))
     numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
     denominator = tf.reduce_sum(y_true + y_pred, axis=(1,2))
 
