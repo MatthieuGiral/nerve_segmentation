@@ -122,11 +122,8 @@ def dice_coeff (y_true, y_pred, smooth = 1):
     if not y_pred.shape[0] or not y_true.shape[0]: return 0.0
     if y_pred == y_true: return 1.0
     numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
-    denominator = tf.reduce_sum(y_true, axis=(1,2)) + \
-        tf.reduce_sum(y_pred, axis=(1,2))
-    #denominator = tf.reduce_sum(y_true + y_pred, axis=(1, 2))
-    #return 1 - numerator / denominator
-    
+    denominator = tf.reduce_sum(y_true + y_pred, axis=(1,2))
+
     dice = 1-(numerator + smooth)/(denominator + smooth)
     return dice
 
