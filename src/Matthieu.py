@@ -136,8 +136,6 @@ def loss_function (y_true, y_pred) :
     return (binary_loss(y_true,y_pred)+dice_coeff(y_true,y_pred))
 
 
-
-
 if __name__ == '__main__':
     img_dim = (544, 544, 1)
     unet = U_net(img_dim)

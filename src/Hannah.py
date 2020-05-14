@@ -3,10 +3,9 @@ import tensorflow as tf
 import os
 import matplotlib.image as mpimg
 from PIL import Image
-
-from src.training_plots import *
-from src.util_images import get_annotated_data
-from src.util_images import *
+from training_plots import *
+from util_images import get_annotated_data
+from util_images import *
 
 def Unet_method(X,Y,img_dim):
     [img_width, img_depth, img_channels] = img_dim
