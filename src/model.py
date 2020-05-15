@@ -29,7 +29,7 @@ class segmenter():
                  ):
         self.img_dims = img_dims
         self.param_conv = param_conv
-        self.architecture = {'encoding_path': architecture.reverse()[:-1],
+        self.architecture = {'encoding_path': list(reversed(architecture))[:-1],
                              'bottom': architecture[-1],
                              'decoding_path': architecture[:1]}
         self.depth = len(architecture)
@@ -43,7 +43,7 @@ class segmenter():
             in_tensor)
         if dropout is not False:
             c = tf.keras.layers.Dropout(dropout)(c)
-        c = tf.keras.layers.Conv2D(filters, (3, 3), kwargs)(c)
+        c = tf.keras.layers.Conv2D(filters, (3, 3), **kwargs)(c)
         return c
 
     @staticmethod
