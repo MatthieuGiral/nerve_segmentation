@@ -31,7 +31,7 @@ class segmenter():
         self.param_conv = param_conv
         self.architecture = {'encoding_path': list(reversed(architecture))[:-1],
                              'bottom': architecture[-1],
-                             'decoding_path': architecture[:1]}
+                             'decoding_path': architecture[1:]}
         self.depth = len(architecture)
         self.loss_function = sum_dice_cross_entropy
         self.is_trained = False
@@ -122,7 +122,7 @@ class segmenter():
 if __name__ == '__main__':
     img_dim = (544, 544, 1)
     test_split = 0.2
-    n_images=20
+    n_images=44
     X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images,test_split, new_size=(544,544), show_images=False)
     unet = segmenter()
     unet.train(X_train,Y_train, epochs=1, batch_size=4)
