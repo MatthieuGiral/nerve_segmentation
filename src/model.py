@@ -109,6 +109,9 @@ class segmenter():
             warnings.warn("Networks Has not been trained")
         evaluation=self.model.evaluate(X,Y)
         if display_prediction==True :
+            n_data=X.shape[0]
+            Random_indices= np.random.randint(low = 0, max= n_data,size =5)
+            X2=X[Random_indices]
             predict_example_and_plot(self.model,X,Y)
         return evaluation
 

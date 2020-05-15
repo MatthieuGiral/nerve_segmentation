@@ -140,6 +140,7 @@ class U_net():
             warnings.warn("Networks Has not been trained")
         evaluation = self.model.evaluate(X, Y)
         if display_prediction == True:
+            n_data=X.shape[0]
             predict_example_and_plot(self.model, X, Y)
         return evaluation
 
