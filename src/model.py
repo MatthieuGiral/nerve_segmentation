@@ -28,11 +28,11 @@ class segmenter():
                  ):
         self.img_dims = img_dims
         self.param_conv = param_conv
-        self.architecture = {'encoding_path': architecture.reverse()[:-1],
+        self.architecture = {'encoding_path': list(reversed(architecture))[:-1],
                              'bottom': architecture[-1],
                              'decoding_path': architecture[:1]}
         self.depth = len(architecture)
-        self.model = self.construct_network()
+        self.model = self._construct_network()
         return
 
     @staticmethod
@@ -51,7 +51,7 @@ class segmenter():
                                             strides=(2, 2), padding='same')(tensor_1),
                     tensor_2])
 
-    def construct_network(self):
+    def _construct_network(self):
         [img_width, img_depth, img_channels] = self.img_dims
         inputs = tf.keras.layers.Input((img_width, img_depth, img_channels))
         intermediate_tensors_before_conv = [inputs]
@@ -96,3 +96,6 @@ if __name__ == '__main__':
     X, Y = get_annotated_data(100, new_size=(544, 544))
     X_train, Y_train = X[:80], Y[:80]
     X_test, Y_test = X[:80], Y[:80]
+    Seg = segmenter()
+    Seg.model.fit(X_train,X_test, batch_size=1)
+    Seg.model.evaluate(X_test,Y_test)
