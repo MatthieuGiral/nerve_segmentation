@@ -30,9 +30,9 @@ def Unet_method(X, Y, img_dim):
 
     model.summary()
     # Définit X et Y !!
-    results = model.fit(X, Y, validation_split=0.1, batch_size=10, epochs=1, shuffle=True)
+    results = model.fit(X, Y, validation_split=0.1, batch_size=5, epochs=5, shuffle=True)
     model.evaluate(X, Y)
-    print(results.history.keys())
+
     training_curves(results)
 
     return model
@@ -49,13 +49,13 @@ def dice_coeff(y_true, y_pred, smooth=1):
 
 
 # définition de notre loss function
-def binary_loss(y_true, y_pred):
-    bce = tf.keras.losses.BinaryCrossentropy()  # binary cross entropy with logits ?
+def cross_entropy_loss(y_true, y_pred):
+    bce = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)  # binary cross entropy with logits ?
     return bce(y_true, y_pred)
 
 
 def loss_function(y_true, y_pred):
-    return (binary_loss(y_true, y_pred) + dice_coeff(y_true, y_pred))
+    return (cross_entropy_loss(y_true, y_pred) + dice_coeff(y_true, y_pred))
 
 
 if __name__ == "__main__":

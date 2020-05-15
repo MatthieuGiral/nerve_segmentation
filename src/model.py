@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import warnings
 import os
 import matplotlib.image as mpimg
 from PIL import Image
@@ -28,11 +29,12 @@ class segmenter():
                  ):
         self.img_dims = img_dims
         self.param_conv = param_conv
-        self.architecture = {'encoding_path': list(reversed(architecture))[:-1],
+        self.architecture = {'encoding_path': architecture.reverse()[:-1],
                              'bottom': architecture[-1],
                              'decoding_path': architecture[:1]}
         self.depth = len(architecture)
-        self.model = self._construct_network()
+        self.model = self.construct_network()
+        self.is_trained = False
         return
 
     @staticmethod
@@ -51,7 +53,7 @@ class segmenter():
                                             strides=(2, 2), padding='same')(tensor_1),
                     tensor_2])
 
-    def _construct_network(self):
+    def construct_network(self):
         [img_width, img_depth, img_channels] = self.img_dims
         inputs = tf.keras.layers.Input((img_width, img_depth, img_channels))
         intermediate_tensors_before_conv = [inputs]
@@ -90,12 +92,38 @@ class segmenter():
 
         return model
 
+    def train(self, X,Y, epochs, batch_size):
+        # checkpointer = tf.keras.callbacks.ModelCheckpoint('model_file', \
+        # callbacks = [
+        # tf.keras.callbacks.EarlyStopping(patience =2, monitor='valid_loss'), #restore_best_weights=True ? #stoppe le training quand valid_loss est minimisée
+        # tf.keras.callbacks.TensorBoard(log_dir='logs', update_freq = 'epoch')] #store l'évolution des test metrics a chaque epochs e
+
+
+        results = self.model.fit(X, Y, validation_split=0.1, batch_size=batch_size, epochs=epochs, callbacks=callbacks)
+        training_curves(results)
+        self.is_trained=True
+        return results
+
+    def evaluate(self,X,Y, display_prediction=False):
+        """ Evaluate the network on X and Y and display 5 random mask predictions"""
+        if self.is_trained()==False :
+            warnings.warn("Networks Has not been trained")
+        evaluation=self.model.evaluate(X,Y)
+        if display_prediction==True :
+            n_data=X.shape[0]
+            Random_indices= np.random.randint(low = 0, max= n_data,size =5)
+            X2=X[Random_indices]
+            Y2=Y[Random_indice]
+            predict_example_and_plot(self.model,X2,Y2)
+        return evaluation
+
+
 if __name__ == '__main__':
     img_dim = (544, 544, 1)
     train_test_split = 0.4
-    X, Y = get_annotated_data(100, new_size=(544, 544))
-    X_train, Y_train = X[:80], Y[:80]
-    X_test, Y_test = X[:80], Y[:80]
-    Seg = segmenter()
-    Seg.model.fit(X_train,X_test, batch_size=1)
-    Seg.model.evaluate(X_test,Y_test)
+    X, Y = get_annotated_data(15, new_size=(544, 544))
+    X_train, Y_train = X[:9], Y[:9]
+    X_test, Y_test = X[9:], Y[9:]
+    unet=segmenter()
+    unet.train(X_train,Y_train, epochs=1, batch_size=4)
+    unet.evaluate(X_test,Y_test,display_prediction=True)

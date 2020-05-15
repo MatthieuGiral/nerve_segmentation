@@ -18,6 +18,7 @@ class U_net():
                  img_dims):
         self.img_dims = img_dims
         self.model = self.construct_network()
+        self.is_trained = False
         return
 
     def construct_network(self):
@@ -123,9 +124,33 @@ class U_net():
 
         return model
 
+    def train(self, X, Y, epochs, batch_size):
+        # checkpointer = tf.keras.callbacks.ModelCheckpoint('model_file', \
+        # callbacks = [
+        # tf.keras.callbacks.EarlyStopping(patience =2, monitor='valid_loss'), #restore_best_weights=True ? #stoppe le training quand valid_loss est minimisée
+        # tf.keras.callbacks.TensorBoard(log_dir='logs', update_freq = 'epoch')] #store l'évolution des test metrics a chaque epochs e
+
+        results = self.model.fit(X, Y, validation_split=0.1, batch_size=batch_size, epochs=epochs, callbacks=callbacks)
+        training_curves(results)
+        self.is_trained = True
+        return results
+
+    def evaluate(self, X, Y, display_prediction=False):
+        if self.is_trained() == False:
+            warnings.warn("Networks Has not been trained")
+        evaluation = self.model.evaluate(X, Y)
+        if display_prediction == True:
+            n_data=X.shape[0]
+            predict_example_and_plot(self.model, X, Y)
+        return evaluation
+
+
+
+    def evaluate_set :
+
 # Définition de notre metrique, exemple avecdice coef :
 def dice_coeff (y_true, y_pred, smooth = 1):
-    #if not len(y_pred) or not len(y_true): return 0.0
+
     if not y_pred.shape[0] or not y_true.shape[0]: return 0.0
     if y_pred == y_true: return 1.0
     numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
