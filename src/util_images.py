@@ -57,6 +57,15 @@ def show_image_with_mask(img_path):
     print('plotted:', f_combined)
     return
 
+def Training_and_test_batch(n_images,test_split, new_size=(544,544), show_images=False):
+    n_train=int(nombre_images*(1-test_split))
+
+    X,Y = get_annotated_data(n_images, show_images, new_size)
+    X_train, Y_train = X[:n_train],Y[:n_train]
+    X_test,Y_test = X[n_train:],Y[n_train:]
+    return (X_train, Y_train, X_test, Y_test)
+
+
 def get_annotated_data(n_images,
                        show_images = False,
                        new_size = None):
