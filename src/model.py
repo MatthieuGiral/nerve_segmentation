@@ -21,7 +21,7 @@ class segmenter():
                  architecture = [1024,512,256,128,64],
                  img_dims = (544,544,1),
                  dropout = False,
-                 loss_function = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
+                 loss_f = sum_dice_cross_entropy,
                  param_conv = { 'dropout': False,
                                 'activation' : 'relu',
                                 'kernel_initializer' : 'he_normal',
@@ -33,14 +33,15 @@ class segmenter():
                              'bottom': architecture[-1],
                              'decoding_path': architecture[:1]}
         self.depth = len(architecture)
-        self.model = self.construct_network()
+        self.loss_function = sum_dice_cross_entropy
         self.is_trained = False
+
+        self.model = self.construct_network()
         return
 
     @staticmethod
     def convolution_process(in_tensor, filters, dropout = False, **kwargs):
-        c = tf.keras.layers.Conv2D(filters, (3, 3), **kwargs)(
-            in_tensor)
+        c = tf.keras.layers.Conv2D(filters, (3, 3), **kwargs)(in_tensor)
         if dropout is not False:
             c = tf.keras.layers.Dropout(dropout)(c)
         c = tf.keras.layers.Conv2D(filters, (3, 3), **kwargs)(c)
@@ -70,7 +71,7 @@ class segmenter():
 
         # Bottom
         intermediate_tensors_after_conv.append(
-             segmenter.convolution_process(intermediate_tensors_before_conv,
+             segmenter.convolution_process(intermediate_tensors_before_conv[-1],
                                            self.architecture['bottom'],
                                            **self.param_conv))
 
@@ -78,7 +79,7 @@ class segmenter():
         for i in range(len(self.architecture['decoding_path'])):
             intermediate_tensors_before_conv.append(
                 segmenter.concat_process(intermediate_tensors_after_conv[-1],
-                                         intermediate_tensors_after_conv[self.depth - 1 - i],
+                                         intermediate_tensors_after_conv[self.depth - 2 - i],
                                          self.architecture['decoding_path'][i]))
             intermediate_tensors_after_conv.append(
                 segmenter.convolution_process(intermediate_tensors_before_conv[-1],
@@ -99,7 +100,7 @@ class segmenter():
         # tf.keras.callbacks.TensorBoard(log_dir='logs', update_freq = 'epoch')] #store l'évolution des test metrics a chaque epochs e
 
 
-        results = self.model.fit(X, Y, validation_split=0.1, batch_size=batch_size, epochs=epochs, callbacks=callbacks)
+        results = self.model.fit(X, Y, validation_split=0.1, batch_size=batch_size, epochs=epochs) #, callbacks=callbacks
         training_curves(results)
         self.is_trained=True
         return results
@@ -123,5 +124,6 @@ if __name__ == '__main__':
     test_split = 0.2
     n_images=20
     X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images,test_split, new_size=(544,544), show_images=False)
+    unet = segmenter()
     unet.train(X_train,Y_train, epochs=1, batch_size=4)
     unet.evaluate(X_test,Y_test,display_prediction=True)
