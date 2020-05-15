@@ -105,6 +105,7 @@ class segmenter():
         return results
 
     def evaluate(self,X,Y, display_prediction=False):
+        """ Evaluate the network on X and Y and display 5 random mask predictions"""
         if self.is_trained()==False :
             warnings.warn("Networks Has not been trained")
         evaluation=self.model.evaluate(X,Y)
@@ -112,7 +113,8 @@ class segmenter():
             n_data=X.shape[0]
             Random_indices= np.random.randint(low = 0, max= n_data,size =5)
             X2=X[Random_indices]
-            predict_example_and_plot(self.model,X,Y)
+            Y2=Y[Random_indice]
+            predict_example_and_plot(self.model,X2,Y2)
         return evaluation
 
 
