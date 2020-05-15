@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import warnings
 import os
 import matplotlib.image as mpimg
 from PIL import Image
@@ -33,6 +34,7 @@ class segmenter():
                              'decoding_path': architecture[:1]}
         self.depth = len(architecture)
         self.model = self.construct_network()
+        self.is_trained = False
         return
 
     @staticmethod
@@ -99,9 +101,12 @@ class segmenter():
 
         results = self.model.fit(X, Y, validation_split=0.1, batch_size=batch_size, epochs=epochs, callbacks=callbacks)
         training_curves(results)
+        self.is_trained=True
         return results
 
-    def evaluate(self,X,Y, display_prediction=False ):
+    def evaluate(self,X,Y, display_prediction=False):
+        if self.is_trained()==False :
+            warnings.warn("Networks Has not been trained")
         evaluation=self.model.evaluate(X,Y)
         if display_prediction==True :
             predict_example_and_plot(self.model,X,Y)
