@@ -90,6 +90,24 @@ class segmenter():
 
         return model
 
+    def train(self, X,Y, epochs, batch_size):
+        # checkpointer = tf.keras.callbacks.ModelCheckpoint('model_file', \
+        # callbacks = [
+        # tf.keras.callbacks.EarlyStopping(patience =2, monitor='valid_loss'), #restore_best_weights=True ? #stoppe le training quand valid_loss est minimisée
+        # tf.keras.callbacks.TensorBoard(log_dir='logs', update_freq = 'epoch')] #store l'évolution des test metrics a chaque epochs e
+
+
+        results = self.model.fit(X, Y, validation_split=0.1, batch_size=batch_size, epochs=epochs, callbacks=callbacks)
+        training_curves(results)
+        return results
+
+    def evaluate(self,X,Y, display_prediction=False ):
+        evaluation=self.model.evaluate(X,Y)
+        if display_prediction==True :
+            predict_example_and_plot(self.model,X,Y)
+        return evaluation
+
+
 if __name__ == '__main__':
     img_dim = (544, 544, 1)
     train_test_split = 0.4
