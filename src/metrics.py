@@ -9,4 +9,4 @@ def dice_coeff (y_true, y_pred, smooth = 1):
     return dice
 
 def sum_dice_cross_entropy (y_true, y_pred):
-    return (tf.keras.losses.SparseCategoricalCrossentropy(from_logits = False)(y_true,y_pred)-dice_coeff(y_true,y_pred))
+    return (tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True)(y_true,y_pred)-dice_coeff(y_true,y_pred))
