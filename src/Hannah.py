@@ -107,9 +107,9 @@ def Unet_method(X,Y,img_dim):
     
     model.summary()
     #Définit X et Y !!
-    results = model.fit(X, Y, validation_split=0.1, batch_size=10, epochs=1, shuffle=True)
+    results = model.fit(X, Y, validation_split=0.1, batch_size=10, epochs=10, shuffle=True)
     model.evaluate(X, Y)
-    training_curves(results, EPOCHS=1)
+    training_curves2(results)
 
 
     return model
@@ -136,17 +136,9 @@ def loss_function (y_true, y_pred):
 if __name__ == "__main__":
     img_dim = (544,544,1)
     train_test_split = 0.4
-    X, Y = get_annotated_data(40, new_size=(544,544))
-    #Y1 = np.where(Y_temp == 0, 1, 0)
-    #print("Y1: ", Y1.shape)
-    #Y2 = np.where(Y_temp == 1, 1, 0)
-    #Y = np.concatenate((Y1,Y2), axis= 3)
-    #print("")
-    #print("Y:")
-    #print (Y)
-    #print(Y.shape)
-    X_train, Y_train = X[:5], Y[:5]
-    X_test, Y_test = X[30:], Y[30:]
+    X, Y = get_annotated_data(100, new_size=(544,544))
+    X_train, Y_train = X[:80], Y[:80]
+    X_test, Y_test = X[:80], Y[:80]
     
     model = Unet_method(X_train, Y_train, img_dim)
     model.evaluate(X_test, Y_test)
