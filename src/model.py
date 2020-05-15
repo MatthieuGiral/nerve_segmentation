@@ -121,6 +121,9 @@ class segmenter():
 if __name__ == '__main__':
     img_dim = (544, 544, 1)
     train_test_split = 0.4
-    X, Y = get_annotated_data(100, new_size=(544, 544))
-    X_train, Y_train = X[:80], Y[:80]
-    X_test, Y_test = X[:80], Y[:80]
+    X, Y = get_annotated_data(15, new_size=(544, 544))
+    X_train, Y_train = X[:9], Y[:9]
+    X_test, Y_test = X[9:], Y[9:]
+    unet=segmenter()
+    unet.train(X_train,Y_train, epochs=1, batch_size=4)
+    unet.evaluate(X_test,Y_test,display_prediction=True)
