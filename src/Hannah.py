@@ -136,13 +136,13 @@ def loss_function (y_true, y_pred):
 if __name__ == "__main__":
     img_dim = (544,544,1)
     train_test_split = 0.4
-    X, Y = get_annotated_data(100, new_size=(544,544))
-    X_train, Y_train = X[:80], Y[:80]
-    X_test, Y_test = X[:80], Y[:80]
+    X, Y = get_annotated_data(500, new_size=(544,544))
+    X_train, Y_train = X[:490], Y[:490]
+    X_test, Y_test = X[:490], Y[:4900]
     
     model = Unet_method(X_train, Y_train, img_dim)
     model.evaluate(X_test, Y_test)
-    predict_example_and_plot(model, X_train[:3], Y_train[:3])
+    predict_example_and_plot(model, X_test, Y_test)
     #print(model.predict(X_test[0]))
 
 

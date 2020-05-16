@@ -5,8 +5,8 @@ def dice_coeff (y_true, y_pred, smooth = 1):
     numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
     denominator = tf.reduce_sum(y_true + y_pred, axis=(1,2))
 
-    dice = 1-(numerator + smooth)/(denominator + smooth)
+    dice = (numerator + smooth)/(denominator + smooth)
     return dice
 
 def sum_dice_cross_entropy (y_true, y_pred):
-    return (tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True)(y_true,y_pred)-dice_coeff(y_true,y_pred))
+    return (tf.keras.losses.SparseCategoricalCrossentropy(from_logits = False)(y_true,y_pred)+1-dice_coeff(y_true,y_pred))

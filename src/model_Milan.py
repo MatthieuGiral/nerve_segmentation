@@ -33,7 +33,7 @@ class segmenter():
                              'bottom': architecture[-1],
                              'decoding_path': architecture[1:]}
         self.depth = len(architecture)
-        self.loss_function = sum_dice_cross_entropy
+        self.loss_function = loss_f
         self.is_trained = False
 
         self.model = self.construct_network()
@@ -97,7 +97,7 @@ class segmenter():
         outputs = tf.keras.layers.Conv2D(2, (1, 1), activation='sigmoid')(intermediate_tensors_after_conv[-1])
 
         model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
-        model.compile(optimizer='adam', loss=self.loss_function, metrics=[dice_coeff])
+        model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=0.1), loss=self.loss_function, metrics=[dice_coeff])
         model.summary()
 
         return model
@@ -123,10 +123,14 @@ class segmenter():
 
 
 if __name__ == '__main__':
-    img_dim = (544, 544, 1)
+    print("a jour2")
+    # gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=0.333)
+    # 
+    # sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
+    img_dim = (480, 480, 1)
     test_split = 0.2
-    n_images=300
+    n_images=100
     X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images,test_split, new_size=(544,544), show_images=False)
-    unet = segmenter([512,256,128,64])
-    unet.train(X_train,Y_train, epochs=5, batch_size=1)
-    unet.evaluate(X_test,Y_test,display_prediction=True)
+    unet = segmenter([512,256,128,64],loss_f= sum_dice_cross_entropy)
+    unet.train(X_train,Y_train, epochs=20, batch_size=10)
+    # unet.evaluate(X_test,Y_test,display_prediction=True)
