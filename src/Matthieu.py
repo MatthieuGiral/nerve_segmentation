@@ -119,7 +119,7 @@ class U_net():
         outputs = tf.keras.layers.Conv2D(2, (1, 1), activation='sigmoid')(c9)
         print(tf.size(outputs))
         model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
-        model.compile(optimizer='adam', loss=loss_function, metrics=[dice_coeff])
+        model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False), metrics=[dice_coeff])
         model.summary()
 
         return model
@@ -146,7 +146,6 @@ class U_net():
 
 
 
-    def evaluate_set :
 
 # Définition de notre metrique, exemple avecdice coef :
 def dice_coeff (y_true, y_pred, smooth = 1):
@@ -172,10 +171,10 @@ if __name__ == '__main__':
     img_dim = (544, 544, 1)
     unet = U_net(img_dim)
     # train_test_split = 0.4
-    # n_sample = 50
+    n_sample = 300
     # n_train = int(train_test_split*n_sample)
-    # X, Y = get_annotated_data(n_sample, new_size=img_dim[:-1])
-    # X_train, Y_train = X[:n_train], Y[:n_train]
+    X, Y = get_annotated_data(n_sample, new_size=img_dim[:-1])
+    X_train, Y_train = X, Y
     # X_test, Y_test = X[n_train:], Y[n_train:]
 
     #model checkpoint
@@ -185,6 +184,6 @@ if __name__ == '__main__':
     #     tf.keras.callbacks.EarlyStopping(patience =2, monitor='valid_loss'), #restore_best_weights=True ? #stoppe le training quand valid_loss est minimisée
     #     tf.keras.callbacks.TensorBoard(log_dir='logs', update_freq = 'epoch')] #store l'évolution des test metrics a chaque epochs et les affiche
     #
-    # unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=4, epochs=10, callbacks = callbacks)  #ajout des callbacks en argument
+    unet.model.fit( X_train, Y_train, validation_split=0.1, batch_size=50, epochs=15)  #ajout des callbacks en argument
     # unet.model.evaluate(X_test,Y_test)
 
