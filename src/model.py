@@ -21,7 +21,7 @@ class segmenter():
                  architecture = [1024,512,256,128,64],
                  img_dims = (544,544,1),
                  dropout = False,
-                 loss_f = sum_dice_cross_entropy,
+                 loss_f = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True),
                  param_conv = { 'dropout': False,
                                 'activation' : 'relu',
                                 'kernel_initializer' : 'he_normal',
@@ -33,7 +33,7 @@ class segmenter():
                              'bottom': architecture[-1],
                              'decoding_path': architecture[1:]}
         self.depth = len(architecture)
-        self.loss_function = sum_dice_cross_entropy
+        self.loss_function = loss_f
         self.is_trained = False
 
         self.model = self.construct_network()
@@ -41,10 +41,18 @@ class segmenter():
 
     @staticmethod
     def convolution_process(in_tensor, filters, dropout = False, **kwargs):
-        c = tf.keras.layers.Conv2D(filters, (3, 3), **kwargs)(in_tensor)
+        print(in_tensor)
+        print(kwargs['padding'])
+        c = tf.keras.layers.Conv2D(filters, (3, 3),
+                                   padding = kwargs['padding'],
+                                   activation=kwargs['activation'],
+                                   kernel_initializer=kwargs['kernel_initializer'])(in_tensor)
         if dropout is not False:
             c = tf.keras.layers.Dropout(dropout)(c)
-        c = tf.keras.layers.Conv2D(filters, (3, 3), **kwargs)(c)
+        c = tf.keras.layers.Conv2D(filters, (3, 3),
+                                   padding = kwargs['padding'],
+                                   activation=kwargs['activation'],
+                                   kernel_initializer=kwargs['kernel_initializer'])(c)
         return c
 
     @staticmethod
@@ -83,7 +91,8 @@ class segmenter():
                                          self.architecture['decoding_path'][i]))
             intermediate_tensors_after_conv.append(
                 segmenter.convolution_process(intermediate_tensors_before_conv[-1],
-                                              self.architecture['decoding_path'][i]))
+                                              self.architecture['decoding_path'][i],
+                                              **self.param_conv))
 
         outputs = tf.keras.layers.Conv2D(2, (1, 1), activation='sigmoid')(intermediate_tensors_after_conv[-1])
 
@@ -101,23 +110,23 @@ class segmenter():
 
     def evaluate(self,X,Y, display_prediction=False):
         """ Evaluate the network on X and Y and display 5 random mask predictions"""
-        if self.is_trained()==False :
+        if self.is_trained==False :
             warnings.warn("Networks Has not been trained")
-        evaluation=self.model.evaluate(X,Y)
+        #evaluation=self.model.evaluate(X,Y, batch_size=2)
         if display_prediction==True :
             n_data=X.shape[0]
-            Random_indices= np.random.randint(low = 0, max= n_data,size =5)
+            Random_indices= np.random.randint(low = 0, high= n_data,size =5)
             X2=X[Random_indices]
-            Y2=Y[Random_indice]
+            Y2=Y[Random_indices]
             predict_example_and_plot(self.model,X2,Y2)
-        return evaluation
+        return
 
 
 if __name__ == '__main__':
-    img_dim = (544, 544, 1)
+    img_dim = (256, 256, 1)
     test_split = 0.2
-    n_images=44
-    X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images,test_split, new_size=(544,544), show_images=False)
-    unet = segmenter()
-    unet.train(X_train,Y_train, epochs=1, batch_size=4)
+    n_images = 500
+    X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images,test_split, new_size=(256,256), show_images=False)
+    unet = segmenter([512,256,128,64],img_dim)
+    unet.train(X_train,Y_train, epochs=5, batch_size=10)
     unet.evaluate(X_test,Y_test,display_prediction=True)
