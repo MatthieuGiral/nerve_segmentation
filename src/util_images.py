@@ -25,18 +25,19 @@ def fimg_to_fmask(img_path):
     maskname = basename.replace(".tif", "_mask.tif")
     return os.path.join(dirname, maskname)
 
-def plot_image_with_mask(img, mask, pred_mask = False):
+def plot_image_with_mask(img, mask, size = 256, pred_mask = None):
     # returns a copy of the image with edges of the mask added in red
-    img = (img*255).astype(np.uint8)
-    mask = (mask*255).astype(np.uint8)
+    img = (np.array(img)*255).astype(np.uint8)
+    mask = (np.array(mask)*255).astype(np.uint8)
     img_color = np.dstack((img, img, img))
-    mask = (np.array(mask) > 0).reshape((544,544))
+    mask = (np.array(mask) > 0).reshape((size,size))
     img_color[mask, 0] = 255  # set channel 0 to bright red, green & blue channels to 0
     img_color[mask, 1] = 0
     img_color[mask, 2] = 0
-    if pred_mask is not False:
-        pred_mask = (pred_mask*255).astype(np.uint8).reshape((544,544,1))
-        pred_mask = (np.array(pred_mask) > 0).reshape((544, 544))
+    if pred_mask is not None:
+        pred_mask = (pred_mask*255).astype(np.uint8).reshape((size,size,1))
+        pred_mask = (np.array(pred_mask) > 0).reshape(size, size)
+        print(np.sum(pred_mask))
         img_color[pred_mask, 0] = 0  # set channel 0 to bright red, green & blue channels to 0
         img_color[pred_mask, 1] = 255
         img_color[pred_mask, 2] = 0
@@ -73,9 +74,9 @@ def get_annotated_data(n_images,
     """
     Read n_images and transform it into arrays
 
-    >>> get_annotated_data(10, \
+    >>> get_annotated_data(100, \
                             new_size = (520,520), \
-                            show_images = True)[0].shape == (10, 520, 520, 1)
+                            show_images = True)[0].shape == (100, 520, 520, 1)
     True
 
 
@@ -86,6 +87,7 @@ def get_annotated_data(n_images,
                             which represents the images and the associated masks
     """
     f_ultrasounds = [img for img in glob.glob(os.path.join(data_dir,"train/*.tif")) if 'mask' not in img][:n_images]
+    print(len(f_ultrasounds))
     f_masks = [fimg_to_fmask(fimg) for fimg in f_ultrasounds][:n_images]
     list_X, list_Y = [], []
     for i in range(int(n_images/100)):
@@ -100,10 +102,11 @@ def get_annotated_data(n_images,
 
         if show_images is True:
             for i in range(max([n_images, 10])):
-                plot_image_with_mask(imgs[i], masks[i])
+                plot_image_with_mask(imgs[i], masks[i],new_size[0])
                 plt.show()
-        list_X.append(np.stack(imgs).reshape((100, new_size[0], new_size[1], 1)) / 255)
-        list_Y.append(np.stack(masks).reshape((100, new_size[0], new_size[1], 1)) / 255)
+        print(i)
+        list_X.append(np.stack(imgs).reshape((-1, new_size[0], new_size[1], 1)) / 255)
+        list_Y.append(np.stack(masks).reshape((-1, new_size[0], new_size[1], 1)) / 255)
         [img.close() for img in imgs]
         [mask.close() for mask in masks]
     return np.concatenate(list_X), np.concatenate(list_Y)
@@ -111,3 +114,4 @@ def get_annotated_data(n_images,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+    get_annotated_data(2000)

@@ -24,5 +24,5 @@ def training_curves (results) :
 def predict_example_and_plot(model, X, Y):
     for i in range(len(X)):
         Y_pred = np.argmax(model.predict(X[i].reshape((1,256, 256, 1))),axis = 3)
-        plot_image_with_mask(X[i], Y[i], Y_pred)
+        plot_image_with_mask(X[i], Y[i], pred_mask=Y_pred)
     return

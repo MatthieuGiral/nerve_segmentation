@@ -22,6 +22,7 @@ class segmenter():
                  img_dims = (544,544,1),
                  dropout = False,
                  loss_f = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True),
+                 metrics = [],
                  param_conv = { 'dropout': False,
                                 'activation' : 'relu',
                                 'kernel_initializer' : 'he_normal',
@@ -35,7 +36,7 @@ class segmenter():
         self.depth = len(architecture)
         self.loss_function = loss_f
         self.is_trained = False
-
+        self.metrics = metrics
         self.model = self.construct_network()
         return
 
@@ -97,7 +98,7 @@ class segmenter():
         outputs = tf.keras.layers.Conv2D(2, (1, 1), activation='sigmoid')(intermediate_tensors_after_conv[-1])
 
         model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
-        model.compile(optimizer='adam', loss=self.loss_function, metrics=[dice_coeff])
+        model.compile(optimizer='adam', loss=self.loss_function, metrics=self.metrics)
         model.summary()
 
         return model
@@ -125,7 +126,7 @@ class segmenter():
 if __name__ == '__main__':
     img_dim = (256, 256, 1)
     test_split = 0.2
-    n_images = 500
+    n_images = 10000
     X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images,test_split, new_size=(256,256), show_images=False)
     unet = segmenter([512,256,128,64],img_dim)
     unet.train(X_train,Y_train, epochs=5, batch_size=10)
