@@ -8,12 +8,24 @@ try:
     from src.training_plots import *
     from src.util_images import get_annotated_data
     from src.util_images import *
-    from src.metrics import *
 except:
     from training_plots import *
     from util_images import get_annotated_data
     from util_images import *
-    from metrics import *
+
+pix = 96
+def predict_example_and_plot(model, X, Y):
+    for i in range(len(X)):
+        Y_pred = model.predict(X[i].reshape((1,pix, pix,1))) > 0.5
+        plot_image_with_mask(X[i], Y[i], pred_mask=Y_pred[:,:,:,1], size = pix)
+    return
+
+
+def dice_coef(y_true, y_pred, smooth=1.0):
+    y_true_f = tf.keras.backend.flatten(y_true)
+    y_pred_f = tf.keras.backend.flatten(y_pred[:,:,:,1])
+    intersection = tf.keras.backend.sum(y_true_f * y_pred_f)
+    return -(2. * intersection + smooth) / (tf.keras.backend.sum(y_true_f) + tf.keras.backend.sum(y_pred_f) + smooth)
 
 class segmenter():
 
@@ -21,7 +33,7 @@ class segmenter():
                  architecture = [1024,512,256,128,64],
                  img_dims = (544,544,1),
                  dropout = False,
-                 loss_f = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True),
+                 loss_f = dice_coef,
                  metrics = [],
                  param_conv = { 'dropout': False,
                                 'activation' : 'relu',
@@ -42,8 +54,6 @@ class segmenter():
 
     @staticmethod
     def convolution_process(in_tensor, filters, dropout = False, **kwargs):
-        print(in_tensor)
-        print(kwargs['padding'])
         c = tf.keras.layers.Conv2D(filters, (3, 3),
                                    padding = kwargs['padding'],
                                    activation=kwargs['activation'],
@@ -96,15 +106,19 @@ class segmenter():
                                               **self.param_conv))
 
         outputs = tf.keras.layers.Conv2D(2, (1, 1), activation='sigmoid')(intermediate_tensors_after_conv[-1])
+        outputs = tf.keras.layers.Softmax(axis = 3)(outputs)
 
         model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
-        model.compile(optimizer='adam', loss=self.loss_function, metrics=self.metrics)
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False,name='Adam'), loss=self.loss_function, metrics=self.metrics)
         model.summary()
 
         return model
 
-    def train(self, X,Y, epochs, batch_size):
-        results = self.model.fit(X, Y, validation_split=0.1, batch_size=batch_size, epochs=epochs) #, callbacks=callbacks
+
+    def train(self, X, Y, epochs, batch_size):
+        results = self.model.fit(X, Y, validation_split=0.1,
+                                 batch_size=batch_size,
+                                 epochs=epochs) #, callbacks=callbacks
         training_curves(results)
         self.is_trained=True
         return results
@@ -124,13 +138,10 @@ class segmenter():
 
 
 if __name__ == '__main__':
-    img_dim = (256, 256, 1)
+    img_dim = (96, 96, 1)
     test_split = 0.2
-    n_images = 4000
-    nerve_presence_wanted=0.45
-    X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images,test_split, new_size=(256,256), show_images=False)
-    unet = segmenter([512,256,128,64],img_dim)
-    train_nerve_presence= np.array([Y_train[i,:,:,:].max() for i in Y_train.shape[0]])
-    factor = nerve_presence_wanted / np.mean(train_nerve_presence)
-    unet.train(X_train,Y_train, epochs=5, batch_size=10, loss_f=dice_loss_generator(factor))
+    n_images = 2000
+    X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images,test_split, new_size=(96,96), show_images=False)
+    unet = segmenter([512,256,128,64],img_dim, loss_f=tf.keras.optimizers.Adam)
+    unet.train(X_train,Y_train, epochs=5, batch_size=10)
     unet.evaluate(X_test,Y_test,display_prediction=True)
