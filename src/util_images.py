@@ -92,6 +92,7 @@ def get_annotated_data(n_images,
         imgs = [Image.open(f_ultrasound) for f_ultrasound in f_ultrasounds[i*50:(i+1)*50]]
         masks = [Image.open(f_mask) for f_mask in f_masks[i*50:(i+1)*50]]
 
+
         if new_size is not None:
             imgs = [img.resize(new_size) for img in imgs]
             masks = [mask.resize(new_size) for mask in masks]
@@ -103,7 +104,7 @@ def get_annotated_data(n_images,
                 plot_image_with_mask(imgs[i], masks[i],new_size[0])
                 plt.show()
         list_X.append(np.stack(imgs).reshape((-1, new_size[0], new_size[1], 1)) / 255)
-        list_Y.append(np.stack(masks).reshape((-1, new_size[0], new_size[1], 1)) / 255)
+        list_Y.append((np.stack(masks).reshape((-1, new_size[0], new_size[1], 1)) / 255).astype('float32'))
         [img.close() for img in imgs]
         [mask.close() for mask in masks]
     return np.concatenate(list_X), np.concatenate(list_Y)

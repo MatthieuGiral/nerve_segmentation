@@ -3,17 +3,30 @@ import tensorflow.keras.backend as K
 import numpy as np
 
 
+def dice_coeff(y_true, y_pred, smooth=1):
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = K.sum(y_true_f * y_pred_f)
+    return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+
+def dice_coeff_loss(y_true, y_pred, smooth=1) :
+    return -dice_coeff(y_true,y_pred,smooth)
 
 def dice_coeff_generator (factor) :
     def dice_coeff(y_true, y_pred, smooth=1):
-        y_pred = tf.reshape(y_pred[:, :, :, 1:], (-1, 256, 256, 1))
-        numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
-        denominator = tf.reduce_sum(y_true + y_pred, axis=(1,2))
-        x=1
-        weighting = x * factor + 1
-        dice = weighting*(numerator + smooth)/(denominator + smooth)
+        y_true_f=K.flatten(y_true)
+        y_pred_f=K.flatten(y_pred)
+        intersection=K.sum(y_true_f*y_pred_f)
+        return (2.*intersection+smooth)/(K.sum(y_true_f)+K.sum(y_pred_f)+smooth)
 
-        return dice
+        # y_pred = tf.reshape(y_pred[:, :, :, 1:], (-1, 256, 256, 1))
+        # numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
+        # denominator = tf.reduce_sum(y_true + y_pred, axis=(1,2))
+        # x=1
+        # weighting = x * factor + 1
+        # dice = weighting*(numerator + smooth)/(denominator + smooth)
+        #
+        # return dice
         # intersection = K.sum(K.sum(y_true * y_pred, axis=-1), axis=-1)
         # sum_pred = K.sum(K.sum(y_pred, axis=-1), axis=-1)
         # sum_true = K.sum(K.sum(y_true, axis=-1), axis=-1)
