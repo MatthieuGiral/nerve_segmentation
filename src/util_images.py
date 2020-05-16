@@ -75,9 +75,8 @@ def get_annotated_data(n_images,
     Read n_images and transform it into arrays
 
     >>> get_annotated_data(100, \
-                            new_size = (520,520), \
-                            show_images = True)[0].shape == (100, 520, 520, 1)
-    True
+                            new_size = (520,520))[0].shape
+    (100, 520, 520, 1)
 
 
     @param n_images: number of images to be fetched
@@ -87,7 +86,6 @@ def get_annotated_data(n_images,
                             which represents the images and the associated masks
     """
     f_ultrasounds = [img for img in glob.glob(os.path.join(data_dir,"train/*.tif")) if 'mask' not in img][:n_images]
-    print(len(f_ultrasounds))
     f_masks = [fimg_to_fmask(fimg) for fimg in f_ultrasounds][:n_images]
     list_X, list_Y = [], []
     for i in range(int(n_images/100)):
@@ -104,7 +102,6 @@ def get_annotated_data(n_images,
             for i in range(max([n_images, 10])):
                 plot_image_with_mask(imgs[i], masks[i],new_size[0])
                 plt.show()
-        print(i)
         list_X.append(np.stack(imgs).reshape((-1, new_size[0], new_size[1], 1)) / 255)
         list_Y.append(np.stack(masks).reshape((-1, new_size[0], new_size[1], 1)) / 255)
         [img.close() for img in imgs]
@@ -114,4 +111,4 @@ def get_annotated_data(n_images,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    get_annotated_data(2000)
+    get_annotated_data(200)
