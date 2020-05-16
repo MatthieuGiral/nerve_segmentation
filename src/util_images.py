@@ -25,20 +25,21 @@ def fimg_to_fmask(img_path):
     maskname = basename.replace(".tif", "_mask.tif")
     return os.path.join(dirname, maskname)
 
-def plot_image_with_mask(img, mask, pred_mask):
+def plot_image_with_mask(img, mask, pred_mask = False):
     # returns a copy of the image with edges of the mask added in red
     img = (img*255).astype(np.uint8)
     mask = (mask*255).astype(np.uint8)
-    pred_mask = (pred_mask*255).astype(np.uint8).reshape((544,544,1))
     img_color = np.dstack((img, img, img))
-    mask_edges = cv2.Canny(np.array(mask), 100, 200) > 0
-    pred_mask_edges = cv2.Canny(np.array(pred_mask), 100, 200) > 0
-    img_color[pred_mask_edges, 0] = 0  # set channel 0 to bright red, green & blue channels to 0
-    img_color[pred_mask_edges, 1] = 255
-    img_color[pred_mask_edges, 2] = 0
-    img_color[mask_edges, 0] = 255  # set channel 0 to bright red, green & blue channels to 0
-    img_color[mask_edges, 1] = 0
-    img_color[mask_edges, 2] = 0
+    mask = (np.array(mask) > 0).reshape((544,544))
+    img_color[mask, 0] = 255  # set channel 0 to bright red, green & blue channels to 0
+    img_color[mask, 1] = 0
+    img_color[mask, 2] = 0
+    if pred_mask is not False:
+        pred_mask = (pred_mask*255).astype(np.uint8).reshape((544,544,1))
+        pred_mask = (np.array(pred_mask) > 0).reshape((544, 544))
+        img_color[pred_mask, 0] = 0  # set channel 0 to bright red, green & blue channels to 0
+        img_color[pred_mask, 1] = 255
+        img_color[pred_mask, 2] = 0
     plt.imshow(img_color)
     plt.show()
     return img_color
@@ -86,21 +87,26 @@ def get_annotated_data(n_images,
     """
     f_ultrasounds = [img for img in glob.glob(os.path.join(data_dir,"train/*.tif")) if 'mask' not in img][:n_images]
     f_masks = [fimg_to_fmask(fimg) for fimg in f_ultrasounds][:n_images]
-    imgs = [Image.open(f_ultrasound) for f_ultrasound in f_ultrasounds]
-    masks = [Image.open(f_mask) for f_mask in f_masks]
+    list_X, list_Y = [], []
+    for i in range(int(n_images/100)):
+        imgs = [Image.open(f_ultrasound) for f_ultrasound in f_ultrasounds[i*100:(i+1)*100]]
+        masks = [Image.open(f_mask) for f_mask in f_masks[i*100:(i+1)*100]]
 
-    if new_size is not None:
-        imgs = [img.resize(new_size) for img in imgs]
-        masks = [mask.resize(new_size) for mask in masks]
-    else:
-        new_size = imgs[0].size
-    if show_images is True:
-        for i in range(n_images):
-            plot_image_with_mask(imgs[i], masks[i])
-            plt.show()
-    X = np.stack(imgs).reshape((n_images, new_size[0], new_size[1], 1)) / 255
-    Y = np.stack(masks).reshape((n_images, new_size[0], new_size[1], 1)) / 255
-    return X, Y
+        if new_size is not None:
+            imgs = [img.resize(new_size) for img in imgs]
+            masks = [mask.resize(new_size) for mask in masks]
+        else:
+            new_size = imgs[0].size
+
+        if show_images is True:
+            for i in range(max([n_images, 10])):
+                plot_image_with_mask(imgs[i], masks[i])
+                plt.show()
+        list_X.append(np.stack(imgs).reshape((100, new_size[0], new_size[1], 1)) / 255)
+        list_Y.append(np.stack(masks).reshape((100, new_size[0], new_size[1], 1)) / 255)
+        [img.close() for img in imgs]
+        [mask.close() for mask in masks]
+    return np.concatenate(list_X), np.concatenate(list_Y)
 
 if __name__ == '__main__':
     import doctest
