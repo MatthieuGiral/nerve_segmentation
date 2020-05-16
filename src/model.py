@@ -95,7 +95,8 @@ class segmenter():
                                               self.architecture['decoding_path'][i],
                                               **self.param_conv))
 
-        outputs = tf.keras.layers.Conv2D(2, (1, 1), activation='sigmoid')(intermediate_tensors_after_conv[-1])
+        pre_outputs = tf.keras.layers.Conv2D(2, (1, 1), activation='sigmoid')(intermediate_tensors_after_conv[-1])
+        outputs = tf.keras.layers.Softmax(axis = 3)(pre_outputs)
 
         model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
         model.compile(optimizer='adam', loss=self.loss_function, metrics=self.metrics)
@@ -126,11 +127,12 @@ class segmenter():
 if __name__ == '__main__':
     img_dim = (256, 256, 1)
     test_split = 0.2
-    n_images = 10000
+    n_images = 1000
     nerve_presence_wanted=0.45
     X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images,test_split, new_size=(256,256), show_images=False)
-    unet = segmenter([512,256,128,64],img_dim)
-    train_nerve_presence= np.array([Y_train[i,0,:,:].max() for i in Y.shape[0]])
+    train_nerve_presence = np.amax(Y_train, axis=(1,2,3))
     factor = nerve_presence_wanted / np.mean(train_nerve_presence)
-    unet.train(X_train,Y_train, epochs=5, batch_size=10, loss_f=dice_loss_generator(factor))
+    unet = segmenter([512, 256, 128, 64], img_dim, loss_f=dice_loss_generator(factor))
+
+    unet.train(X_train,Y_train, epochs=10, batch_size=20)
     unet.evaluate(X_test,Y_test,display_prediction=True)

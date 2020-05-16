@@ -88,9 +88,9 @@ def get_annotated_data(n_images,
     f_ultrasounds = [img for img in glob.glob(os.path.join(data_dir,"train/*.tif")) if 'mask' not in img][:n_images]
     f_masks = [fimg_to_fmask(fimg) for fimg in f_ultrasounds][:n_images]
     list_X, list_Y = [], []
-    for i in range(int(n_images/100)):
-        imgs = [Image.open(f_ultrasound) for f_ultrasound in f_ultrasounds[i*100:(i+1)*100]]
-        masks = [Image.open(f_mask) for f_mask in f_masks[i*100:(i+1)*100]]
+    for i in range(int(n_images/50)):
+        imgs = [Image.open(f_ultrasound) for f_ultrasound in f_ultrasounds[i*50:(i+1)*50]]
+        masks = [Image.open(f_mask) for f_mask in f_masks[i*50:(i+1)*50]]
 
         if new_size is not None:
             imgs = [img.resize(new_size) for img in imgs]

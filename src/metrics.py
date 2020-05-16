@@ -1,16 +1,28 @@
 import tensorflow as tf
-import tf.keras.backend as K
+import tensorflow.keras.backend as K
+import numpy as np
 
 
 
 def dice_coeff_generator (factor) :
     def dice_coeff(y_true, y_pred, smooth=1):
-        intersection = K.sum(K.sum(y_true * y_pred, axis=-1), axis=-1)
-        sum_pred = K.sum(K.sum(y_pred, axis=-1), axis=-1)
-        sum_true = K.sum(K.sum(y_true, axis=-1), axis=-1)
+        y_pred = tf.reshape(y_pred[:, :, :, 1:], (-1, 256, 256, 1))
+        numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2))
+        denominator = tf.reduce_sum(y_true + y_pred, axis=(1,2))
+        x=1
+        weighting = x * factor + 1
+        dice = weighting*(numerator + smooth)/(denominator + smooth)
 
-        weighting = K.greater_equal(sum_true, 1) * factor + 1
-        return K.mean(weighting * (2. * intersection + smooth) / (sum_true + sum_pred + smooth))
+        return dice
+        # intersection = K.sum(K.sum(y_true * y_pred, axis=-1), axis=-1)
+        # sum_pred = K.sum(K.sum(y_pred, axis=-1), axis=-1)
+        # sum_true = K.sum(K.sum(y_true, axis=-1), axis=-1)
+        # if K.greater_equal(sum_pred,1):
+        #     x= 1
+        # else :
+        #     x=0
+        # weighting = factor*x+1
+        # return K.mean(weighting * (2. * intersection + smooth) / (sum_true + sum_pred + smooth))
     return dice_coeff
 
 def dice_loss_generator (factor) :

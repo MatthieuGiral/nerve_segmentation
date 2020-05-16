@@ -129,8 +129,8 @@ if __name__ == '__main__':
     # sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
     img_dim = (480, 480, 1)
     test_split = 0.2
-    n_images=100
+    n_images=30
     X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images,test_split, new_size=(544,544), show_images=False)
     unet = segmenter([512,256,128,64],loss_f= sum_dice_cross_entropy)
-    unet.train(X_train,Y_train, epochs=20, batch_size=10)
+    unet.train(X_train,Y_train, epochs=20, batch_size=5)
     # unet.evaluate(X_test,Y_test,display_prediction=True)
