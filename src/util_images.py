@@ -38,9 +38,7 @@ def plot_image_with_mask(img, mask, size = 256, pred_mask = None):
         pred_mask = (pred_mask*255).astype(np.uint8).reshape((size,size,1))
         pred_mask = (np.array(pred_mask) > 0).reshape(size, size)
         print(np.sum(pred_mask))
-        img_color[pred_mask, 0] = 0  # set channel 0 to bright red, green & blue channels to 0
         img_color[pred_mask, 1] = 255
-        img_color[pred_mask, 2] = 0
     plt.imshow(img_color)
     plt.show()
     return img_color

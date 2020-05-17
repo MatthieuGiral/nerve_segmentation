@@ -1,10 +1,17 @@
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import os
+import glob
+import pickle
 try:
     from util_images import plot_image_with_mask
+    from model_new import segmenter
 except:
     from src.util_images import plot_image_with_mask
+    from src.model_new import segmenter
 import numpy as np
+
+model_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),'../models/')
 
 def training_curves (results) :
     """ Displays accuracy on training and validation batches after each epoch"""
@@ -19,10 +26,19 @@ def training_curves (results) :
     plt.show()
     return
 
-
-
-def predict_example_and_plot(model, X, Y):
-    for i in range(len(X)):
-        Y_pred = np.argmax(model.predict(X[i].reshape((1,256, 256, 1))),axis = 3)
-        plot_image_with_mask(X[i], Y[i], pred_mask=Y_pred)
+def load_training_sessions():
+    for res_path in glob.glob(os.path.join(model_dir,'*.pck')):
+        res = pickle.load(open(res_path, 'rb'))
+        print(f'{res.id_model} {res.img_dims} {res.score} {res.training_results} {res.lambd} {res.architecture}')
     return
+
+
+
+def predict_example_and_plot(model, X, Y, size):
+    for i in range(len(X)):
+        Y_pred = model.predict(X[i].reshape((1,size, size, 1))) > 0.5
+        plot_image_with_mask(X[i], Y[i], pred_mask=Y_pred, size = size)
+    return
+
+if __name__ == '__main__':
+    load_training_sessions()
