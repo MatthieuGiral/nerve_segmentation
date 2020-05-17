@@ -10,7 +10,7 @@ except:
     from src.util_images import plot_image_with_mask
     from src.model_new import segmenter
 import numpy as np
-
+output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),'../output/')
 model_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),'../models/')
 
 def training_curves (results) :
@@ -39,7 +39,7 @@ def predict_example_and_plot(model, X, Y, size):
         plot_image_with_mask(X[i], Y[i], pred_mask=Y_pred, size = size)
     return
 
-def plot_param_search(dir = 'archit', names = {}, title = None):
+def plot_param_search(dir = 'archit', names = {18069: 'dropout = 0.2'}, title = None):
     if title is None:
         title = dir
     fig = plt.figure(figsize=(10,5))
@@ -49,7 +49,8 @@ def plot_param_search(dir = 'archit', names = {}, title = None):
         plt.plot(res['training_results']['loss'], label = f'{names[id]} final score: {res.score[1]}')
     plt.xlabel('epochs')
     plt.ylabel('loss')
-    plt.title()
+    plt.title(title)
+    plt.savefig(os.path.join(output_dir,f'{title}.png'))
     return
 
 
