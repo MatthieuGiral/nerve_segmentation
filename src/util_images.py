@@ -6,7 +6,13 @@ import cv2
 import numpy as np
 from PIL import Image
 
+try:
+    from src.augmentation import *
+except:
+    from augmentation import *
+
 data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),'../data')
+output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),'../output/')
 
 def plot_image(img, title=None):
     plt.figure(figsize=(15, 20))
@@ -25,7 +31,7 @@ def fimg_to_fmask(img_path):
     maskname = basename.replace(".tif", "_mask.tif")
     return os.path.join(dirname, maskname)
 
-def plot_image_with_mask(img, mask, size = 256, pred_mask = None):
+def plot_image_with_mask(img, mask, size = 256, pred_mask = None, save = None):
     # returns a copy of the image with edges of the mask added in red
     img = (np.array(img)*255).astype(np.uint8)
     mask = (np.array(mask)*255).astype(np.uint8)
@@ -40,6 +46,8 @@ def plot_image_with_mask(img, mask, size = 256, pred_mask = None):
         print(np.sum(pred_mask))
         img_color[pred_mask, 1] = 255
     plt.imshow(img_color)
+    if save is not None:
+        plt.savefig(os.path.join(output_dir, f'{save}{np.random.randint(1000,10000)}.png'))
     plt.show()
     return img_color
 
@@ -57,10 +65,13 @@ def show_image_with_mask(img_path):
     print('plotted:', f_combined)
     return
 
-def Training_and_test_batch(n_images,test_split, new_size=(544,544), show_images=False):
-    n_train=int(n_images*(1-test_split))
-
+def Training_and_test_batch(n_images,test_split, new_size=(544,544), show_images=False, augmentate_data = False):
     X,Y = get_annotated_data(n_images, show_images, new_size)
+    if augmentate_data:
+        X,Y = augmentate(X,Y)
+        n_images = n_images*3
+
+    n_train=int(n_images*(1-test_split))
     X_train, Y_train = X[:n_train],Y[:n_train]
     X_test,Y_test = X[n_train:],Y[n_train:]
     return (X_train, Y_train, X_test, Y_test)
@@ -110,4 +121,4 @@ def get_annotated_data(n_images,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    get_annotated_data(200)
+    get_annotated_data(200, new_size=(580,580),show_images=True)

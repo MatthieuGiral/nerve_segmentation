@@ -27,7 +27,7 @@ def training_curves (results) :
     return
 
 def load_training_sessions():
-    for res_path in glob.glob(os.path.join(model_dir,'*.pck')):
+    for res_path in glob.glob(os.path.join(model_dir,'lambdas/*.pck')):
         res = pickle.load(open(res_path, 'rb'))
         print(f'{res.id_model} {res.img_dims} {res.lambd} {res.architecture}')
     return
@@ -44,15 +44,39 @@ def plot_param_search(dir = 'archit', names = {18069: 'dropout = 0.2'}, title = 
         title = dir
     fig = plt.figure(figsize=(10,5))
     for id in names.keys():
-        res_path = os.path.join(model_dir,f'{dir}/{id}.pck')
+        res_path = os.path.join(model_dir,f'{dir}/model_{id}.pck')
         res = pickle.load(open(res_path, 'rb'))
-        plt.plot(res['training_results']['loss'], label = f'{names[id]} final score: {res.score[1]}')
+        plt.plot(res.training_results['loss'], label = f'{names[id]} final test score: {res.score[1]:.2f}')
     plt.xlabel('epochs')
     plt.ylabel('loss')
     plt.title(title)
+    plt.legend()
     plt.savefig(os.path.join(output_dir,f'{title}.png'))
     return
 
 
 if __name__ == '__main__':
     load_training_sessions()
+    plot_param_search('dropout',
+                      {32695:'dropout 0.4',
+                       57459:'dropout 0.2',
+                       61022:'dropout 0.1',
+                       66569:'no dropout'},
+                      'dropout_graph')
+    plot_param_search('architecture',
+                      {55403: 'architecture [512,256,128,64]',
+                       66569: 'architecture [1024,512,256,128,64]',
+                       93655: 'architecture [1024,512,256,128,64,32]',
+                       59849: 'architecture [256,128,64]'},
+                      'architecture_graph')
+    plot_param_search('augmentation',
+                      {66569: 'No augmentation',
+                       75870: 'flip & mirror'},
+                      'augmentation')
+    # plot_param_search('lambdas',
+    #                   {68876: 'lam = 1e-5',
+    #                    74659: 'lam = 1e-2',
+    #                    99523: 'lam = 1e-3',
+    #                    99990: 'lam = 1e-4'},
+    #                   'lambdas')
+

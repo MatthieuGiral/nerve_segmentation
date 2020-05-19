@@ -10,18 +10,20 @@ try:
     from src.training_plots import *
     from src.util_images import get_annotated_data
     from src.util_images import *
+    from src.augmentation import *
 except:
     from training_plots import *
     from util_images import get_annotated_data
     from util_images import *
+    from augmentation import *
 
 pix = 96
 model_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),'../models/')
 
-def predict_example_and_plot(model, X, Y, size):
+def predict_example_and_plot(model, X, Y, size = 96, save = 'img'):
     for i in range(len(X)):
-        Y_pred = model.predict(X[i].reshape((1,pix, pix,1))) > 0.5
-        plot_image_with_mask(X[i], Y[i], pred_mask=Y_pred, size = pix)
+        Y_pred = model.predict(X[i].reshape((1,size, size,1))) > 0.5
+        plot_image_with_mask(X[i], Y[i], pred_mask=Y_pred, size = size, save = save)
     return
 
 
@@ -58,7 +60,7 @@ class segmenter():
         self.img_dims = img_dims
         self.param_conv = param_conv
         self.architecture = {'encoding_path': list(reversed(architecture))[:-1],
-                             'bottom': architecture[-1],
+                             'bottom': architecture[0],
                              'decoding_path': architecture[1:]}
         self.optimizer = tf.keras.optimizers.Adam(lambd)
         self.lambd = lambd
@@ -70,8 +72,8 @@ class segmenter():
         self.model = self.construct_network()
         return
 
-    def save(self):
-        file = open(os.path.join(model_dir,f'model_{self.id_model}.pck'), 'wb')
+    def save(self, dir):
+        file = open(os.path.join(model_dir,f'{dir}/model_{self.id_model}.pck'), 'wb')
 
         pickle.dump(self, file)
         file.close()
@@ -160,7 +162,7 @@ class segmenter():
         self.is_trained=True
         return results
 
-    def evaluate(self,X,Y, display_prediction=False):
+    def evaluate(self,X,Y, display_prediction=False, save = ''):
         """ Evaluate the network on X and Y and display 5 random mask predictions"""
         if self.is_trained==False :
             warnings.warn("Networks Has not been trained")
@@ -171,7 +173,7 @@ class segmenter():
             Random_indices= np.random.randint(low = 0, high= n_data,size =5)
             X2=X[Random_indices]
             Y2=Y[Random_indices]
-            predict_example_and_plot(self.model,X2,Y2, size = self.img_dims[0])
+            predict_example_and_plot(self.model,X2,Y2, size = self.img_dims[0], save = save)
         return
 
 
@@ -179,34 +181,29 @@ if __name__ == '__main__':
     img_dim = (96, 96, 1)
     test_split = 0.2
     n_images = 5000
-    X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images,test_split, new_size=(96,96), show_images=False)
-    for size in [64,96,128,160]:
-        try:
-            X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images, test_split, new_size=(size, size),
-                                                                       show_images=False)
-            unet = segmenter([1024,512,256,128,64],
-                             (size,size,1),
-                             loss_f=dice_coef_loss,
-                             lambd=1e-5,
-                             metrics = [dice_coef_eval])
-            unet.train(X_train,Y_train, epochs=20, batch_size=64)
-            unet.evaluate(X_test,Y_test,display_prediction=False)
-            unet.save()
-        except:
-            print('error')
     X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images, test_split, new_size=(96, 96),
                                                                show_images=False)
-    for lam in [1e-6,1e-5,1e-4,1e-3,1e-2,1e-1]:
-        try:
-            unet = segmenter([1024,512,256,128,64],
-                             img_dim,
-                             loss_f=dice_coef_loss,
-                             lambd=lam,
-                             metrics = [dice_coef_eval])
-            unet.train(X_train,Y_train, epochs=20, batch_size=64)
-            unet.evaluate(X_test,Y_test,display_prediction=False)
-            unet.save()
-        except:
-            print('error')
-
+    unet = segmenter([1024, 512, 256, 128, 64],
+                     (96, 96, 1),
+                     loss_f=dice_coef_loss,
+                     lambd=1e-5,
+                     metrics=[dice_coef_eval])
+    unet.train(X_train, Y_train, epochs=20, batch_size=32)
+    unet.evaluate(X_test, Y_test, display_prediction=True, save = 'img')
+    unet.save('classic')
+    # X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images,test_split, new_size=(96,96), show_images=False)
+    # for lam in [1e-5,1e-4,1e-3,1e-2]:
+    #     try:
+    #         X_train, Y_train, X_test, Y_test = Training_and_test_batch(n_images, test_split, new_size=(96, 96),
+    #                                                                    show_images=False)
+    #         unet = segmenter([1024,512,256,128,64],
+    #                          (96,96,1),
+    #                          loss_f=dice_coef_loss,
+    #                          lambd=lam,
+    #                          metrics = [dice_coef_eval])
+    #         unet.train(X_train,Y_train, epochs=20, batch_size=32)
+    #         unet.evaluate(X_test,Y_test,display_prediction=False)
+    #         unet.save('lambdas')
+    #     except:
+    #         print('error')
 
